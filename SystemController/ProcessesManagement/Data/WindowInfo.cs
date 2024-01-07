@@ -16,10 +16,13 @@ namespace SystemController.ProcessesManagement.Data
         public IntPtr Handle { get; set; }
         public List<WindowInfo> ChildWindows { get; set; }
         public WindowInfo? ParentWindow { get; set; }
+        public WindowAttributes Attributes { get; set; }
         public POINT Position { get; set; }
+        public WindowRole Role { get; set; }
         public SIZE Size { get; set; }
         public WindowState State { get; set; }
         public string? Title { get; set; }
+        public int Transparency { get; set; }
         public bool Visible { get; set; }
 
 
