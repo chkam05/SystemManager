@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SystemController.MouseKeyboard.Data
+namespace SystemController.Data
 {
-    public struct POINT
+    public struct SIZE
     {
-        public int X;
-        public int Y;
+        public int Width;
+        public int Height;
     }
 }

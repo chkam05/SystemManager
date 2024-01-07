@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SystemController.MouseKeyboard.Data;
+using SystemController.Data;
 
 namespace SystemController.MouseKeyboard.Events
 {

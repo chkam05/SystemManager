@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using SystemController.Data;
 using SystemController.MouseKeyboard.Data;
 using SystemController.MouseKeyboard.Events;
 using static SystemController.MouseKeyboard.KeyboardReader;
