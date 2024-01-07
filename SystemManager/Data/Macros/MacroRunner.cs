@@ -7,11 +7,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using SystemController.MouseKeyboard;
 using SystemController.MouseKeyboard.Data;
 using SystemManager.Data.Macros.DataModels;
 using SystemManager.Data.Macros.Events;
+using SystemManager.Data.Macros.Serialization;
 using SystemManager.ViewModels.Base;
 
 namespace SystemManager.Data.Macros
@@ -24,7 +26,7 @@ namespace SystemManager.Data.Macros
         private static readonly JsonSerializerSettings SERIALIZER_SETTINGS = new JsonSerializerSettings()
         {
             Formatting = Formatting.Indented,
-            NullValueHandling = NullValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
         };
 
 
@@ -180,7 +182,7 @@ namespace SystemManager.Data.Macros
             if (File.Exists(filePath))
             {
                 var fileContent = File.ReadAllText(filePath);
-                var macroItems = JsonConvert.DeserializeObject<List<MacroBase>>(fileContent);
+                var macroItems = JsonConvert.DeserializeObject<List<MacroBase>>(fileContent, new MacroConverter());
 
                 CurrentFilePath = filePath;
 
@@ -243,6 +245,9 @@ namespace SystemManager.Data.Macros
             _runnerWorker.RunWorkerCompleted += RunnerWorkCompleted;
 
             IsRunning = true;
+
+            RunnerStart?.Invoke(this, new MacroRunnerStartEventArgs());
+
             _runnerWorker.RunWorkerAsync();
         }
 
@@ -260,69 +265,115 @@ namespace SystemManager.Data.Macros
         /// <param name="e"> Do Work Event Arguments. </param>
         private void RunnerWork(object? sender, DoWorkEventArgs e)
         {
+            var mouseKeyboardController = new MouseKeyboardController();
             var worker = sender as BackgroundWorker;
+
+            Exception? exception = null;
+            MacroBase? currentMacroItem = null;
+            int macoItemIndex = -1;
 
             if (MacroItems.Any())
             {
                 foreach (var macroItem in MacroItems)
                 {
                     if (e.Cancel || (worker?.CancellationPending ?? false))
+                    {
+                        e.Result = new object?[]
+                        {
+                            exception,
+                            currentMacroItem,
+                            -1
+                        };
                         return;
+                    }
+
+                    currentMacroItem = macroItem;
+                    macoItemIndex++;
 
                     try
                     {
                         if (macroItem is MacroDelay macroDelay)
                         {
-
+                            int delay = LongToInt(macroDelay.DelayMiliseconds, false);
+                            Thread.Sleep(delay);
                         }
                         else if (macroItem is MacroKeyDown macroKeyDown)
                         {
-
+                            mouseKeyboardController.SimulateKeyPress(
+                                macroKeyDown.KeyCode,
+                                KeyState.Press);
                         }
                         else if (macroItem is MacroKeyUp macroKeyUp)
                         {
-
+                            mouseKeyboardController.SimulateKeyPress(
+                                macroKeyUp.KeyCode,
+                                KeyState.Release);
                         }
                         else if (macroItem is MacroKeyClick macroKeyClick)
                         {
-
+                            mouseKeyboardController.SimulateKeyPress(
+                                macroKeyClick.KeyCode,
+                                KeyState.PressRelease);
                         }
                         else if (macroItem is MacroKeyCombination macroKeyCombination)
                         {
-
+                            mouseKeyboardController.SimulateKeyCombination(
+                                macroKeyCombination.KeyCodes.ToArray());
                         }
                         else if (macroItem is MacroMouseDown macroMouseDown)
                         {
-
+                            mouseKeyboardController.SimulateMouseClick(
+                                macroMouseDown.MouseButton,
+                                KeyState.Press);
                         }
                         else if (macroItem is MacroMouseUp macroMouseUp)
                         {
-
+                            mouseKeyboardController.SimulateMouseClick(
+                                macroMouseUp.MouseButton,
+                                KeyState.Release);
                         }
                         else if (macroItem is MacroMouseClick macroMouseClick)
                         {
-
+                            mouseKeyboardController.SimulateMouseClick(
+                                macroMouseClick.MouseButton,
+                                KeyState.PressRelease);
                         }
                         else if (macroItem is MacroMouseMove macroMouseMove)
                         {
-
+                            mouseKeyboardController.SimulateMouseMove(
+                                Convert.ToInt32(macroMouseMove.X),
+                                Convert.ToInt32(macroMouseMove.Y));
                         }
                         else if (macroItem is MacroMouseScrollHorizontal macroMouseScrollHorizontal)
                         {
-
+                            mouseKeyboardController.SimulateHorizontalMouseScroll(
+                                Convert.ToInt32(macroMouseScrollHorizontal.ScrollShift));
                         }
                         else if (macroItem is MacroMouseScrollVertical macroMouseScrollVertical)
                         {
-
+                            mouseKeyboardController.SimulateVerticalMouseScroll(
+                                Convert.ToInt32(macroMouseScrollVertical.ScrollShift));
                         }
                     }
                     catch (Exception exc)
                     {
-                        e.Result = exc;
+                        e.Result = new object?[]
+                        {
+                            exc,
+                            currentMacroItem,
+                            macoItemIndex
+                        };
                         return;
                     }
                 }
             }
+
+            e.Result = new object?[]
+            {
+                exception,
+                currentMacroItem,
+                macoItemIndex
+            };
         }
 
         //  --------------------------------------------------------------------------------
@@ -331,13 +382,33 @@ namespace SystemManager.Data.Macros
         /// <param name="e"> Run Worker Completed Event Arguments. </param>
         private void RunnerWorkCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled)
-                RunnerFinished?.Invoke(this, new MacroRunnerFinishedEventArgs(null, true));
+            if (e.Result is object?[] result)
+            {
+                var exception = (Exception?)result[0];
+                var macroItem = (MacroBase?)result[1];
+                var macroItemIndex = (int?)result[2];
 
-            if (e.Result is Exception exc)
-                RunnerFinished?.Invoke(this, new MacroRunnerFinishedEventArgs(exc));
+                if (e.Cancelled)
+                    RunnerFinished?.Invoke(this, new MacroRunnerFinishedEventArgs(
+                        macroItem: macroItem,
+                        macroItemIndex: macroItemIndex ?? -1,
+                        stopped: true));
 
-            RunnerFinished?.Invoke(this, new MacroRunnerFinishedEventArgs(null));
+                else if (exception != null)
+                {
+                    RunnerFinished?.Invoke(this, new MacroRunnerFinishedEventArgs(
+                        exception: exception,
+                        macroItem: macroItem,
+                        macroItemIndex: macroItemIndex ?? -1));
+                }
+
+                else
+                {
+                    RunnerFinished?.Invoke(this, new MacroRunnerFinishedEventArgs(
+                        macroItem: macroItem,
+                        macroItemIndex: macroItemIndex ?? -1));
+                }
+            }
 
             IsRunning = false;
         }
@@ -393,6 +464,29 @@ namespace SystemManager.Data.Macros
         }
 
         #endregion SETUP METHODS
+
+        #region UTILITY METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Convert long to int. </summary>
+        /// <param name="value"> Long value. </param>
+        /// <param name="allowNegative"> Allow negative numbers. </param>
+        /// <returns> Converted long to int value. </returns>
+        private int LongToInt(long value, bool allowNegative = true)
+        {
+            if (value > int.MaxValue)
+                return int.MaxValue;
+
+            if (!allowNegative && value < 0)
+                return 0;
+
+            if (value < int.MinValue)
+                return int.MinValue;
+
+            return Convert.ToInt32(value);
+        }
+
+        #endregion UTILITY METHODS
 
     }
 }

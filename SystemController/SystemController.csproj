@@ -4,6 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>SystemController</Title>
+    <Version>1.0.0.0</Version>
+    <Authors>Kamil Karpiński</Authors>
+    <Product>SystemControllerLibrary</Product>
+    <Description>Library for interact with Windows Core.</Description>
+    <Copyright>Kamil Karpiński</Copyright>
+    <PackageProjectUrl>https://github.com/chkam05/SystemManager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/chkam05/SystemManager</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

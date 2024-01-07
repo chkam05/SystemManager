@@ -17,7 +17,8 @@
     d:DesignWidth="800"
     
     Background="Transparent"
-    Foreground="White">
+    Foreground="White"
+    Unloaded="Page_Unloaded">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -40,6 +41,7 @@
 
             <macroConv:MacroKeyCombinationNameConverter x:Key="MacroKeyCombinationNameConverter"/>
             <macroConv:MacroKeyNameConverter x:Key="MacroKeyNameConverter"/>
+            <macroConv:MacroRunnerStateIconKindConverter x:Key="MacroRunnerStateIconKindConverter"/>
             <macroConv:MacroTypeIconKindConverter x:Key="MacroTypeIconKindConverter"/>
             <macroConv:MacroTypeNameConverter x:Key="MacroTypeNameConverter"/>
             <macroConv:MouseButtonNameConverter x:Key="MouseButtonNameConverter"/>
@@ -634,7 +636,7 @@
                         Orientation="Horizontal">
 
                         <cex:ButtonEx
-                            IconKind="Play"
+                            IconKind="{Binding IsRunning, Mode=OneWay, Converter={StaticResource MacroRunnerStateIconKindConverter}}"
                             Click="RunMacroButtonExClick"/>
 
                     </StackPanel>

@@ -27,6 +27,13 @@ namespace SystemManager.Windows
     public partial class MainWindow : WindowEx, INotifyPropertyChanged
     {
 
+        //  COMMANDS
+
+        public static RoutedCommand NewCommand = new RoutedCommand();
+        public static RoutedCommand OpenCommand = new RoutedCommand();
+        public static RoutedCommand SaveCommand = new RoutedCommand();
+
+
         //  VARIABLES
 
         private ObservableCollection<MainMenuItemViewModel> _mainMenuItems;
@@ -64,10 +71,15 @@ namespace SystemManager.Windows
         public MainWindow()
         {
             //  Initialize data.
+            _mainMenuItems = new ObservableCollection<MainMenuItemViewModel>();
+
             SetupMainMenu();
 
             //  Initialize user interface.
             InitializeComponent();
+
+            //  Setup window elements.
+            SetupKeysShortcuts();
         }
 
         #endregion CLASS METHODS
@@ -109,6 +121,19 @@ namespace SystemManager.Windows
         #region SETUP METHODS
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Setup keys shortucts. </summary>
+        private void SetupKeysShortcuts()
+        {
+            NewCommand.InputGestures.Add(new KeyGesture(Key.N, ModifierKeys.Control));
+            OpenCommand.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control));
+            SaveCommand.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
+
+            CommandManager.RegisterClassCommandBinding(typeof(MainWindow), new CommandBinding(NewCommand, OnNewExecuted));
+            CommandManager.RegisterClassCommandBinding(typeof(MainWindow), new CommandBinding(OpenCommand, OnOpenExecuted));
+            CommandManager.RegisterClassCommandBinding(typeof(MainWindow), new CommandBinding(SaveCommand, OnSaveExecuted));
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Setup main menu items. </summary>
         private void SetupMainMenu()
         {
@@ -122,6 +147,46 @@ namespace SystemManager.Windows
         }
 
         #endregion SETUP METHODS
+
+        #region SHORTCUT METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after executing Ctrl+N keyboard shortuct. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Executed Routed Event Arguments.</param>
+        private void OnNewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (_pagesControl.CurrentPage is MacrosPage macrosPage)
+            {
+                macrosPage.OnNewExecuted(sender, e);
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after executing Ctrl+O keyboard shortuct. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Executed Routed Event Arguments.</param>
+        private void OnOpenExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (_pagesControl.CurrentPage is MacrosPage macrosPage)
+            {
+                macrosPage.OnOpenExecuted(sender, e);
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after executing Ctrl+S keyboard shortuct. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Executed Routed Event Arguments.</param>
+        private void OnSaveExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (_pagesControl.CurrentPage is MacrosPage macrosPage)
+            {
+                macrosPage.OnSaveExecuted(sender, e);
+            }
+        }
+
+        #endregion SHORTCUT METHODS
 
         #region WINDOW METHODS
 

@@ -25,6 +25,9 @@ using chkam05.Tools.ControlsEx.Data;
 using System.Collections.ObjectModel;
 using chkam05.Tools.ControlsEx.Events;
 using static chkam05.Tools.ControlsEx.Events.Delegates;
+using SystemManager.Data.Macros.Events;
+using SystemManager.Controls;
+using System.Reflection;
 
 namespace SystemManager.Pages
 {
@@ -50,6 +53,8 @@ namespace SystemManager.Pages
             //  Setup components.
             _imContainer = imContainer;
             _macroRunner = new MacroRunner();
+            _macroRunner.RunnerStart += OnRunnerStart;
+            _macroRunner.RunnerFinished += OnRunnerEnd;
 
             //  Initialize user interface.
             InitializeComponent();
@@ -62,6 +67,118 @@ namespace SystemManager.Pages
         }
 
         #endregion CLASS METHODS
+
+        #region FILES MANAGEMENT METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Create new Macro. </summary>
+        private void CreateNewMacro()
+        {
+            InternalMessageClose<InternalMessageCloseEventArgs> closeHandler = (s, e) =>
+            {
+                if (e.Result == InternalMessageResult.Yes)
+                    _macroRunner.Clear();
+            };
+
+            if (_macroRunner.MacroItems.Any())
+            {
+                var internalMessageClose = CreateLeaveCurrentMacroIM("New Macro", closeHandler);
+                _imContainer.ShowMessage(internalMessageClose);
+            }
+            else
+            {
+                closeHandler?.Invoke(null, new InternalMessageCloseEventArgs(InternalMessageResult.Yes));
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Open Macro from file. </summary>
+        private void OpenMacroFromFile()
+        {
+            InternalMessageClose<FilesSelectorInternalMessageCloseEventArgs> closeFileHandler = (s, e) =>
+            {
+                if (e.Result == InternalMessageResult.Ok)
+                {
+                    try
+                    {
+                        _macroRunner.OpenMacroItems(e.FilePath);
+                    }
+                    catch (Exception exc)
+                    {
+                        var errorIM = CreateOpenMacroErrorIM(e.FilePath, exc);
+                        _imContainer.ShowMessage(errorIM);
+                    }
+                }
+            };
+
+            InternalMessageClose<InternalMessageCloseEventArgs> closeHandler = (s, e) =>
+            {
+                if (e.Result == InternalMessageResult.Yes)
+                {
+                    var openMacroInternalMessage = CreateOpenMacroIM(closeFileHandler);
+                    _imContainer.ShowMessage(openMacroInternalMessage);
+                }
+            };
+
+            if (_macroRunner.MacroItems.Any())
+            {
+                var internalMessageClose = CreateLeaveCurrentMacroIM("New Macro", closeHandler);
+                _imContainer.ShowMessage(internalMessageClose);
+            }
+            else
+            {
+                closeHandler?.Invoke(null, new InternalMessageCloseEventArgs(InternalMessageResult.Yes));
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Save Macro to file. </summary>
+        private void SaveMacroToFile()
+        {
+            if (_macroRunner.CanSaveCurrent)
+            {
+                try
+                {
+                    _macroRunner.SaveMacroItems(null, true);
+                }
+                catch (Exception exc)
+                {
+                    var errorIM = CreateSaveMacroErrorIM(_macroRunner.CurrentFilePath ?? string.Empty, exc);
+                    _imContainer.ShowMessage(errorIM);
+                }
+            }
+            else
+            {
+                SaveMacroToNewFile();
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Save Macro to new file. </summary>
+        private void SaveMacroToNewFile()
+        {
+            InternalMessageClose<FilesSelectorInternalMessageCloseEventArgs> closeFileHandler = (s, e) =>
+            {
+                if (e.Result == InternalMessageResult.Ok)
+                {
+                    try
+                    {
+                        _macroRunner.SaveMacroItems(e.FilePath, false);
+                    }
+                    catch (Exception exc)
+                    {
+                        var errorIM = CreateSaveMacroErrorIM(e.FilePath, exc);
+                        _imContainer.ShowMessage(errorIM);
+                    }
+                }
+            };
+
+            var internalMessage = CreateSaveMacroIM(closeFileHandler);
+            _imContainer.ShowMessage(internalMessage);
+        }
+
+
+        #endregion FILES MANAGEMENT METHODS
 
         #region HEADER BUTTON INTERACTION METHODS
 
@@ -105,21 +222,7 @@ namespace SystemManager.Pages
         /// <param name="e"> Routed Event Arguments. </param>
         private void FileNewContextMenuItemExClick(object sender, RoutedEventArgs e)
         {
-            InternalMessageClose<InternalMessageCloseEventArgs> closeHandler = (s, e) =>
-            {
-                if (e.Result == InternalMessageResult.Yes)
-                    _macroRunner.Clear();
-            };
-
-            if (_macroRunner.MacroItems.Any())
-            {
-                var internalMessageClose = CreateLeaveCurrentMacroIM("New Macro", closeHandler);
-                _imContainer.ShowMessage(internalMessageClose);
-            }
-            else
-            {
-                closeHandler?.Invoke(null, new InternalMessageCloseEventArgs(InternalMessageResult.Yes));
-            }
+            CreateNewMacro();
         }
 
         //  --------------------------------------------------------------------------------
@@ -128,40 +231,7 @@ namespace SystemManager.Pages
         /// <param name="e"> Routed Event Arguments. </param>
         private void FileOpenContextMenuItemExClick(object sender, RoutedEventArgs e)
         {
-            InternalMessageClose<FilesSelectorInternalMessageCloseEventArgs> closeFileHandler = (s, e) =>
-            {
-                if (e.Result == InternalMessageResult.Ok)
-                {
-                    try
-                    {
-                        _macroRunner.OpenMacroItems(e.FilePath);
-                    }
-                    catch (Exception exc)
-                    {
-                        var errorIM = CreateOpenMacroErrorIM(e.FilePath, exc);
-                        _imContainer.ShowMessage(errorIM);
-                    }
-                }
-            };
-
-            InternalMessageClose<InternalMessageCloseEventArgs> closeHandler = (s, e) =>
-            {
-                if (e.Result == InternalMessageResult.Yes)
-                {
-                    var openMacroInternalMessage = CreateOpenMacroIM(closeFileHandler);
-                    _imContainer.ShowMessage(openMacroInternalMessage);
-                }
-            };
-
-            if (_macroRunner.MacroItems.Any())
-            {
-                var internalMessageClose = CreateLeaveCurrentMacroIM("New Macro", closeHandler);
-                _imContainer.ShowMessage(internalMessageClose);
-            }
-            else
-            {
-                closeHandler?.Invoke(null, new InternalMessageCloseEventArgs(InternalMessageResult.Yes));
-            }
+            OpenMacroFromFile();
         }
 
         //  --------------------------------------------------------------------------------
@@ -170,22 +240,7 @@ namespace SystemManager.Pages
         /// <param name="e"> Routed Event Arguments. </param>
         private void FileSaveContextMenuItemExClick(object sender, RoutedEventArgs e)
         {
-            if (_macroRunner.CanSaveCurrent)
-            {
-                try
-                {
-                    _macroRunner.SaveMacroItems(null, true);
-                }
-                catch (Exception exc)
-                {
-                    var errorIM = CreateSaveMacroErrorIM(_macroRunner.CurrentFilePath ?? string.Empty, exc);
-                    _imContainer.ShowMessage(errorIM);
-                }
-            }
-            else
-            {
-                FileSaveAsContextMenuItemExClick(sender, e);
-            }
+            SaveMacroToFile();
         }
 
         //  --------------------------------------------------------------------------------
@@ -194,24 +249,7 @@ namespace SystemManager.Pages
         /// <param name="e"> Routed Event Arguments. </param>
         private void FileSaveAsContextMenuItemExClick(object sender, RoutedEventArgs e)
         {
-            InternalMessageClose<FilesSelectorInternalMessageCloseEventArgs> closeFileHandler = (s, e) =>
-            {
-                if (e.Result == InternalMessageResult.Ok)
-                {
-                    try
-                    {
-                        _macroRunner.SaveMacroItems(e.FilePath, false);
-                    }
-                    catch (Exception exc)
-                    {
-                        var errorIM = CreateSaveMacroErrorIM(e.FilePath, exc);
-                        _imContainer.ShowMessage(errorIM);
-                    }
-                }
-            };
-
-            var internalMessage = CreateSaveMacroIM(closeFileHandler);
-            _imContainer.ShowMessage(internalMessage);
+            SaveMacroToNewFile();
         }
 
         #endregion HEADER FILE CONTEXT MENU INTERACTION METHODS
@@ -458,19 +496,23 @@ namespace SystemManager.Pages
                     {
                         if (macroItem is MacroKeyCombination macroKeyCombination)
                         {
-                            macroKeyCombination.KeyCodes = new ObservableCollection<byte>(keyReaderIM.PressedKeys);
+                            if (keyReaderIM.PressedKeys.Any())
+                                macroKeyCombination.KeyCodes = new ObservableCollection<byte>(keyReaderIM.PressedKeys);
                         }
                         else if (macroItem is MacroKeyDown macroKeyDown)
                         {
-                            macroKeyDown.KeyCode = keyReaderIM.PressedKeys.First();
+                            if (keyReaderIM.PressedKeys.Any())
+                                macroKeyDown.KeyCode = keyReaderIM.PressedKeys.First();
                         }
                         else if (macroItem is MacroKeyUp macroKeyUp)
                         {
-                            macroKeyUp.KeyCode = keyReaderIM.PressedKeys.First();
+                            if (keyReaderIM.PressedKeys.Any())
+                                macroKeyUp.KeyCode = keyReaderIM.PressedKeys.First();
                         }
                         else if (macroItem is MacroKeyClick macroKeyClick)
                         {
-                            macroKeyClick.KeyCode = keyReaderIM.PressedKeys.First();
+                            if (keyReaderIM.PressedKeys.Any())
+                                macroKeyClick.KeyCode = keyReaderIM.PressedKeys.First();
                         }
                     }
                 };
@@ -558,6 +600,86 @@ namespace SystemManager.Pages
         }
 
         #endregion MACRO ITEMS MANAGEMENT METHODS
+
+        #region MACRO RUNNER METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after MacroRunner start. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Macro Runner Start Event Arguments. </param>
+        private void OnRunnerStart(object? sender, MacroRunnerStartEventArgs e)
+        {
+            _macroItemsListView.IsEnabled = false;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after MacroRunner stop. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Macro Runner Finished Event Arguments. </param>
+        private void OnRunnerEnd(object? sender, MacroRunnerFinishedEventArgs e)
+        {
+            if (e.Exception != null)
+            {
+                var macroItemType = e.MacroItem?.GetType()?.Name ?? "unknown";
+
+                var title = "MacroRunner error";
+                var message = $"An error occurred while executing macro command {macroItemType} at index {e.MacroItemIndex}:" +
+                    $"{Environment.NewLine}{e.Exception.Message}";
+                var imError = InternalMessageEx.CreateErrorMessage(_imContainer, title, message);
+
+                InternalMessageExHelper.SetInternalMessageAppearance(imError);
+
+                _imContainer.ShowMessage(imError);
+            }
+
+            _macroItemsListView.IsEnabled = true;
+        }
+
+        #endregion MACRO RUNNER METHODS
+
+        #region PAGE METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked during unloading page. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Routed Event Arguments. </param>
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        #endregion PAGE METHODS
+
+        #region SHORTCUT METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after executing Ctrl+N keyboard shortuct. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Executed Routed Event Arguments.</param>
+        internal void OnNewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            CreateNewMacro();
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after executing Ctrl+O keyboard shortuct. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Executed Routed Event Arguments.</param>
+        internal void OnOpenExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            OpenMacroFromFile();
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after executing Ctrl+S keyboard shortuct. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Executed Routed Event Arguments.</param>
+        internal void OnSaveExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            SaveMacroToFile();
+        }
+
+        #endregion SHORTCUT METHODS
 
     }
 }
