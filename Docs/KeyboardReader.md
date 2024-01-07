@@ -2,6 +2,8 @@
 
 A class for listening for keyboard events.
 
+## Getters
+
 ### *bool* IsListening { get; }:
 
 Returns whether KeyboardReader is actively listening for keyboard events.
