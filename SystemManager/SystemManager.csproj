@@ -14,6 +14,7 @@
     <PackageProjectUrl>https://github.com/chkam05/SystemManager</PackageProjectUrl>
     <RepositoryUrl>https://github.com/chkam05/SystemManager</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +31,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SystemController\SystemController.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

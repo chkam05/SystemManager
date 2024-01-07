@@ -17,7 +17,7 @@
     DataContext="{Binding RelativeSource={RelativeSource self}}"
     Foreground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     Height="450"
-    IconKind="MicrosoftWindows"
+    IconKind="Tools"
     MouseOverTitleBarButtonBackground="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     MouseOverTitleBarButtonForeground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     PressedTitleBarButtonBackground="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
