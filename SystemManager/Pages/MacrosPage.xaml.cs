@@ -640,12 +640,21 @@ namespace SystemManager.Pages
         #region PAGE METHODS
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked during loading page. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Routed Event Arguments. </param>
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            _macroRunner.StartListeningMouseKeyboard();
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Method invoked during unloading page. </summary>
         /// <param name="sender"> Object that invoked the method. </param>
         /// <param name="e"> Routed Event Arguments. </param>
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-
+            _macroRunner.StopListeningMouseKeyboard();
         }
 
         #endregion PAGE METHODS

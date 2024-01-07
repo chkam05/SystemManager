@@ -165,16 +165,46 @@ namespace SystemController.ProcessesManagement
         #region PROCESS METHODS
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Get process command location. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> Process command location or null. </returns>
+        private string? GetProcessCommandLocation(Process process)
+        {
+            try
+            {
+                if (process.MainModule != null && process.MainModule.FileName != null)
+                {
+                    return process.MainModule.FileName;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Win32Exception)
+            {
+                return null;
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Get process CPU usage. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> CPU usage. </returns>
         private double GetProcessCPUUsage(Process process)
         {
-            TimeSpan totalProcessorTime = process.TotalProcessorTime;
-            TimeSpan uptime = process.StartTime - DateTime.Now;
+            try
+            {
+                TimeSpan totalProcessorTime = process.TotalProcessorTime;
+                TimeSpan uptime = process.StartTime - DateTime.Now;
 
-            if (uptime.TotalSeconds > 0)
-                return (double)(totalProcessorTime.TotalMilliseconds / uptime.TotalMilliseconds) * 100.0;
+                if (uptime.TotalSeconds > 0)
+                    return (double)(totalProcessorTime.TotalMilliseconds / uptime.TotalMilliseconds) * 100.0;
+            }
+            catch (Win32Exception)
+            {
+                return 0.0;
+            }
 
             return 0.0;
         }
@@ -187,8 +217,15 @@ namespace SystemController.ProcessesManagement
         {
             PROCESS_MEMORY_COUNTERS_EX counters = new PROCESS_MEMORY_COUNTERS_EX();
 
-            if (GetProcessMemoryInfo(process.Handle, out counters, (uint)Marshal.SizeOf(typeof(PROCESS_MEMORY_COUNTERS_EX))))
-                return counters.PrivateUsage;
+            try
+            {
+                if (GetProcessMemoryInfo(process.Handle, out counters, (uint)Marshal.SizeOf(typeof(PROCESS_MEMORY_COUNTERS_EX))))
+                    return counters.PrivateUsage;
+            }
+            catch (Win32Exception)
+            {
+                return 0;
+            }
 
             return 0;
         }
@@ -199,18 +236,48 @@ namespace SystemController.ProcessesManagement
         /// <returns> Process mode. </returns>
         private ProcessMode GetProcessMode(Process process)
         {
-            if (Environment.Is64BitOperatingSystem)
+            try
             {
-                bool isWow64;
+                if (Environment.Is64BitOperatingSystem)
+                {
+                    bool isWow64;
 
-                if (IsWow64Process(process.Handle, out isWow64) && isWow64)
-                    return ProcessMode.Bit32;
+                    if (IsWow64Process(process.Handle, out isWow64) && isWow64)
+                        return ProcessMode.Bit32;
 
-                else
-                    return ProcessMode.Bit64;
+                    else
+                        return ProcessMode.Bit64;
+                }
+            }
+            catch (Win32Exception)
+            {
+                return ProcessMode.Bit32;
             }
 
             return ProcessMode.Bit32;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Get process priority class. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> Process priority class. </returns>
+        private ProcessPriorityClass? GetProcesssPriorityClass(Process process)
+        {
+            try
+            {
+                if (process?.PriorityClass != null)
+                {
+                    return process.PriorityClass;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Win32Exception)
+            {
+                return null;
+            }
         }
 
         //  --------------------------------------------------------------------------------
@@ -221,10 +288,17 @@ namespace SystemController.ProcessesManagement
         {
             FILETIME creationTime, exitTime, kernelTime, userTime;
 
-            if (GetProcessTimes(process.Handle, out creationTime, out exitTime, out kernelTime, out userTime))
+            try
             {
-                long ticks = userTime.dwHighDateTime << 32 | (uint)userTime.dwLowDateTime;
-                return TimeSpan.FromTicks(ticks);
+                if (GetProcessTimes(process.Handle, out creationTime, out exitTime, out kernelTime, out userTime))
+                {
+                    long ticks = userTime.dwHighDateTime << 32 | (uint)userTime.dwLowDateTime;
+                    return TimeSpan.FromTicks(ticks);
+                }
+            }
+            catch (Win32Exception)
+            {
+                return TimeSpan.Zero;
             }
 
             return TimeSpan.Zero;
@@ -280,16 +354,80 @@ namespace SystemController.ProcessesManagement
         }
 
         //  --------------------------------------------------------------------------------
-        /// <summary> Check if process has any window. </summary>
+        /// <summary> Check if process has available handle. </summary>
         /// <param name="process"> Process. </param>
-        /// <returns> True - process has any window; False - otherwise. </returns>
-        private bool HasWindows(Process process)
+        /// <returns> True - process has handle; False - otherwise. </returns>
+        private bool HasProcessHandle(Process process)
+        {
+            try
+            {
+                if (process.Handle != IntPtr.Zero)
+                    return true;
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if process has available main module. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - process has main moudle; False - otherwise. </returns>
+        private bool HasProcessMainModule(Process process)
+        {
+            try
+            {
+                if (process.MainModule != null)
+                    return true;
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if process has main window. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - process has main window; False - otherwise. </returns>
+        private bool HasProcessMainWindow(Process process)
+        {
+            return process.MainWindowHandle != IntPtr.Zero;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if process has available priority class. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - process has priority class; False - otherwise. </returns>
+        private bool HasProcessPriorityClass(Process process)
+        {
+            try
+            {
+                ProcessPriorityClass? processPriorityClass = process.PriorityClass;
+
+                if (processPriorityClass != null)
+                    return true;
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if process has any subwindows. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - process has any subwindows; False - otherwise. </returns>
+        private bool HasProcessSubWindows(Process process)
         {
             bool anyWindow = false;
-            IntPtr mainWindowHandle = process.MainWindowHandle;
-
-            if (mainWindowHandle != IntPtr.Zero)
-                return true;
 
             foreach (ProcessThread thread in process.Threads)
             {
@@ -305,49 +443,104 @@ namespace SystemController.ProcessesManagement
         }
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Check if process has available total processor time. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - process has total processor time; False - otherwise. </returns>
+        private bool HasProcessTotalProcessorTime(Process process)
+        {
+            try
+            {
+                if (process.TotalProcessorTime >= TimeSpan.Zero)
+                    return true;
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Is process system process. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> True - is system process; False - otherwise. </returns>
         private bool IsSystemProcess(Process process, string processUserName)
         {
-            bool hasSystemCharacteristics = process.PriorityClass == ProcessPriorityClass.High
-                && process.Id <= 4;
+            try
+            {
+                bool hasSystemCharacteristics = process.PriorityClass == ProcessPriorityClass.High
+                    && process.Id <= 4;
 
-            bool isSystemAccount = processUserName.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase);
+                bool isSystemAccount = processUserName.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase);
 
-            return hasSystemCharacteristics || isSystemAccount;
+                return hasSystemCharacteristics || isSystemAccount;
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Get list of processes. </summary>
         /// <returns> List of processes. </returns>
-        public List<ProcessInfo> GetProcesses()
+        public List<ProcessInfo> GetProcesses(out List<Exception> exceptions)
         {
+            exceptions = new List<Exception>();
             List<ProcessInfo> processes = new List<ProcessInfo>();
 
             foreach (Process process in Process.GetProcesses())
             {
-                var processUserName = GetProcessUserName(process);
-
-                ProcessInfo processInfo = new ProcessInfo()
+                try
                 {
-                    Id = process.Id,
-                    Name = process.ProcessName,
-                    Description = process.MainWindowTitle,
-                    Type = process.MainWindowHandle == IntPtr.Zero ? "Background Process" : "Application",
-                    CommandLocation = process.MainModule?.FileName,
-                    CPUUsage = GetProcessCPUUsage(process),
-                    MemoryUsage = GetProcessMemoryUsage(process),
-                    HasWindows = HasWindows(process),
-                    IsSystemService = IsSystemProcess(process, processUserName),
-                    Mode = GetProcessMode(process),
-                    Priority = ProcessPriorityClass.Normal,
-                    ThreadCount = process.Threads.Count,
-                    Uptime = GetProcessUptime(process),
-                    UserName = processUserName,
-                };
+                    bool hasHandle = HasProcessHandle(process);
+                    bool hasMainModule = HasProcessMainModule(process);
+                    bool hasPriorityClass = HasProcessPriorityClass(process);
+                    bool hasTotalProcTime = HasProcessTotalProcessorTime(process);
 
-                processes.Add(processInfo);
+                    var processUserName = GetProcessUserName(process);
+
+                    ProcessInfo processInfo = new ProcessInfo()
+                    {
+                        Id = process.Id,
+                        Name = process.ProcessName,
+                        Description = process.MainWindowTitle,
+                        Type = HasProcessMainWindow(process) ? "Application" : "Background Process",
+                        HasWindows = HasProcessMainWindow(process) ? true : HasProcessSubWindows(process),
+                        ThreadCount = process.Threads.Count,
+                        UserName = processUserName,
+                    };
+
+                    if (hasHandle)
+                    {
+                        processInfo.MemoryUsage = GetProcessMemoryUsage(process);
+                        processInfo.Mode = GetProcessMode(process);
+                        processInfo.Uptime = GetProcessUptime(process);
+                    }
+
+                    if (hasMainModule)
+                    {
+                        processInfo.CommandLocation = GetProcessCommandLocation(process);
+                    }
+
+                    if (hasPriorityClass)
+                    {
+                        processInfo.IsSystemService = IsSystemProcess(process, processUserName);
+                        processInfo.Priority = GetProcesssPriorityClass(process);
+                    }
+                    
+                    if (hasTotalProcTime)
+                    {
+                        processInfo.CPUUsage = GetProcessCPUUsage(process);
+                    }
+
+                    processes.Add(processInfo);
+                }
+                catch (Exception exception)
+                {
+                    exceptions.Add(exception);
+                }
             }
 
             return processes;

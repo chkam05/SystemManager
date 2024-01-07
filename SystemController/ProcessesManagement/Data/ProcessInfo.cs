@@ -22,7 +22,7 @@ namespace SystemController.ProcessesManagement.Data
         public bool HasWindows { get; set; }
         public bool IsSystemService { get; set; }
         public ProcessMode Mode { get; set; }
-        public ProcessPriorityClass Priority { get; set; }
+        public ProcessPriorityClass? Priority { get; set; }
         public int ThreadCount { get; set; }
         public TimeSpan Uptime { get; set; }
         public string? UserName { get; set; }

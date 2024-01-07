@@ -5,16 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using SystemManager.Data.Macros.DataModels;
 
-namespace SystemManager.Data.Macros.Events
+namespace SystemManager.Data.Processes.Events
 {
-    public class MacroRunnerFinishedEventArgs : EventArgs
+    public class ProcessesLoaderFinishedEventArgs : EventArgs
     {
 
         //  VARIABLES
 
         public Exception? Exception { get; private set; }
-        public MacroBase? MacroItem { get; private set; }
-        public int MacroItemIndex { get; private set; }
+        public int LastProcessIndex { get; private set; }
         public bool Stopped { get; private set; }
 
 
@@ -31,17 +30,15 @@ namespace SystemManager.Data.Macros.Events
         #region CLASS METHODS
 
         //  --------------------------------------------------------------------------------
-        /// <summary> MacroRunnerFinishedEventArgs class methods. </summary>
+        /// <summary> ProcessesLoaderFinishedEventArgs class methods. </summary>
         /// <param name="exception"> Run exception. </param>
-        /// <param name="macroItem"> Last loaded macro item. </param>
-        /// <param name="macroItemIndex"> Index of last loaded macro item. </param>
-        /// <param name="stopped"> Runner stopped. </param>
-        public MacroRunnerFinishedEventArgs(Exception? exception = null, MacroBase? macroItem = null,
-            int macroItemIndex = -1, bool stopped = false)
+        /// <param name="lastProcessIndex"> Index of last loaded process. </param>
+        /// <param name="stopped"> Loading stopped. </param>
+        public ProcessesLoaderFinishedEventArgs(Exception? exception = null, int lastProcessIndex = -1,
+            bool stopped = false)
         {
             Exception = exception;
-            MacroItem = macroItem;
-            MacroItemIndex = macroItemIndex;
+            LastProcessIndex = lastProcessIndex;
             Stopped = stopped;
         }
 

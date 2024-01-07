@@ -100,6 +100,13 @@ namespace SystemManager.Windows
             PagesControl.LoadPageOrGetLast(new MacrosPage(IMContainer));
         }
 
+        //  --------------------------------------------------------------------------------
+        /// <summary> Open processes page main menu item. </summary>
+        private void OpenProcessesPageMainMenuItemSelect()
+        {
+            PagesControl.LoadPageOrGetLast(new ProcessesPage(IMContainer));
+        }
+
         #endregion MAIN MENU INTERACTION METHODS
 
         #region PROPERITES CHANGED METHODS
@@ -140,6 +147,7 @@ namespace SystemManager.Windows
             var mainMenuItems = new List<MainMenuItemViewModel>()
             {
                 new MainMenuItemViewModel("Macros", "Scripts for automated management", PackIconKind.Code, OpenMacrosPageMainMenuItemSelect),
+                new MainMenuItemViewModel("Processes", "Show running processes", PackIconKind.Memory, OpenProcessesPageMainMenuItemSelect),
                 new MainMenuItemViewModel("Close", "Shut down application", PackIconKind.Power, CloseApplicationMainMenuItemSelect)
             };
 

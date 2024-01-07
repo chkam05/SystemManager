@@ -159,9 +159,35 @@ namespace SystemManager.Data.Macros
         {
             if (MouseReader.IsListening)
                 MouseReader.StopListening();
+
+            if (KeyboardReader.IsListening)
+                KeyboardReader.StopListening();
         }
 
         #endregion CLASS METHODS
+
+        #region LISTENING METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Start listening mouse nad keyboard. </summary>
+        public void StartListeningMouseKeyboard()
+        {
+            KeyboardReader.StartListening();
+            MouseReader.StartListening();
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Stop listening mouse nad keyboard. </summary>
+        public void StopListeningMouseKeyboard()
+        {
+            if (MouseReader.IsListening)
+                MouseReader.StopListening();
+
+            if (KeyboardReader.IsListening)
+                KeyboardReader.StopListening();
+        }
+
+        #endregion LISTENING METHODS
 
         #region FILES METHODS
 
@@ -426,8 +452,6 @@ namespace SystemManager.Data.Macros
                 if (e.KeyState == KeyState.Press)
                     KeyCodes = e.HeldKeyCodes;
             };
-
-            KeyboardReader.StartListening();
         }
 
         //  --------------------------------------------------------------------------------
@@ -459,8 +483,6 @@ namespace SystemManager.Data.Macros
                         break;
                 }
             };
-
-            MouseReader.StartListening();
         }
 
         #endregion SETUP METHODS

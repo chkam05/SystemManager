@@ -1,0 +1,382 @@
+﻿<Page
+    x:Class="SystemManager.Pages.ProcessesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SystemManager.Pages"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    
+    Background="Transparent"
+    Foreground="White"
+    Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- STATIC -->
+
+            <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+
+
+            <!-- STYLES -->
+
+            <Style x:Key="ProcessInfoHeaderTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="MinWidth" Value="128"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="ProcessInfoValueTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="ProcessItemButtonExStyle" BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                <Setter Property="Margin" Value="0,0,0,8"/>
+                <Setter Property="MinWidth" Value="128"/>
+            </Style>
+
+            <Style x:Key="StatusBarPackIconStyle" TargetType="materialDesign:PackIcon">
+                <Setter Property="Height" Value="16"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="16"/>
+            </Style>
+
+            <Style x:Key="StatusBarTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="8,0,0,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StatusBarValueTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="2,0,0,0"/>
+                <Setter Property="MinWidth" Value="32"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            
+
+            <!-- DATA TEMPLATES -->
+
+            <DataTemplate x:Key="ProcessItemViewModelDataTemplate">
+                <Grid>
+                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Vertical">
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="PID:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding Id}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Name:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding Name}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Description:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding Description}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Type:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding Type}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Command/Location:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding CommandLocation}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="CPU Usage:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding CPUUsage}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Memory Usage:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding MemoryUsage}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Is system service:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding IsSystemService}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Mode:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding Mode}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Priority:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding Priority}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Threads:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding ThreadCount}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Uptime:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding Uptime}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                Text="Owner:"/>
+
+                            <TextBlock
+                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                Text="{Binding UserName}"/>
+
+                        </StackPanel>
+
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Vertical">
+
+                        <cex:ButtonEx
+                            Content="Close"
+                            IconKind="Close"
+                            Style="{StaticResource ProcessItemButtonExStyle}"
+                            Click="ProcessCloseButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Kill"
+                            IconKind="Shutdown"
+                            Style="{StaticResource ProcessItemButtonExStyle}"
+                            Click="ProcessKillButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Windows"
+                            IconKind="Application"
+                            Click="ProcessWindowsButtonExClick">
+                            
+                            <cex:ButtonEx.Style>
+                                <Style BasedOn="{StaticResource ProcessItemButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasWindows}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    
+                                </Style>
+                            </cex:ButtonEx.Style>
+                        </cex:ButtonEx>
+
+                    </StackPanel>
+
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Border
+        Background="White"
+        BorderBrush="{x:Null}"
+        BorderThickness="0">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Border
+                Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                BorderBrush="{x:Null}"
+                BorderThickness="0"
+                Grid.Row="0"
+                Padding="8">
+
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+
+                        <cex:ButtonEx
+                            Content="Auto Refresh"
+                            IconKind="CheckBoxOutlineBlank"
+                            Click="AutoRefreshButtonExClick"/>
+
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <cex:ButtonEx
+                            IconKind="Refresh"
+                            Click="RefreshButtonExClick"/>
+
+                    </StackPanel>
+
+                </Grid>
+                
+            </Border>
+
+            <cex:ListViewEx
+                x:Name="_processesListView"
+                Grid.Row="1"
+                ItemsSource="{Binding Processes}"
+                ItemTemplate="{StaticResource ProcessItemViewModelDataTemplate}"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                SelectionChanged="ProcessesListViewSelectionChanged"/>
+
+            <Border
+                Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                BorderBrush="{x:Null}"
+                BorderThickness="0"
+                Grid.Row="2"
+                Padding="8">
+
+                <StackPanel
+                    Orientation="Horizontal">
+
+                    <materialDesign:PackIcon
+                        Kind="Memory"
+                        Style="{StaticResource StatusBarPackIconStyle}"/>
+
+                    <TextBlock
+                        Margin="8,0,0,0"
+                        Style="{StaticResource StatusBarValueTextBlockStyle}"
+                        Text="{Binding ProcessesCount}"/>
+
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+
+    </Border>
+    
+</Page>

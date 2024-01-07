@@ -18,6 +18,7 @@
     
     Background="Transparent"
     Foreground="White"
+    Loaded="Page_Loaded"
     Unloaded="Page_Unloaded">
 
     <Page.Resources>
