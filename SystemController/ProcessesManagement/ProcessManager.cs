@@ -165,45 +165,10 @@ namespace SystemController.ProcessesManagement
         #region PROCESS METHODS
 
         //  --------------------------------------------------------------------------------
-        /// <summary> Get list of processes. </summary>
-        /// <returns> List of processes. </returns>
-        public List<ProcessInfo> GetProcesses()
-        {
-            List<ProcessInfo> processes = new List<ProcessInfo>();
-
-            foreach (Process process in Process.GetProcesses())
-            {
-                var processUserName = GetProcessUserName(process);
-
-                ProcessInfo processInfo = new ProcessInfo()
-                {
-                    Id = process.Id,
-                    Name = process.ProcessName,
-                    Description = process.MainWindowTitle,
-                    Type = process.MainWindowHandle == IntPtr.Zero ? "Background Process" : "Application",
-                    CommandLocation = process.MainModule?.FileName,
-                    CPUUsage = GetProcessCPUUsage(process),
-                    MemoryUsage = GetProcessMemoryUsage(process),
-                    IsSystemService = IsSystemProcess(process, processUserName),
-                    Mode = GetProcessMode(process),
-                    Priority = ProcessPriorityClass.Normal,
-                    ThreadCount = process.Threads.Count,
-                    Uptime = GetProcessUptime(process),
-                    UserName = processUserName,
-                    Windows = GetWindows(process)
-                };
-
-                processes.Add(processInfo);
-            }
-
-            return processes;
-        }
-
-        //  --------------------------------------------------------------------------------
         /// <summary> Get process CPU usage. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> CPU usage. </returns>
-        private static double GetProcessCPUUsage(Process process)
+        private double GetProcessCPUUsage(Process process)
         {
             TimeSpan totalProcessorTime = process.TotalProcessorTime;
             TimeSpan uptime = process.StartTime - DateTime.Now;
@@ -218,7 +183,7 @@ namespace SystemController.ProcessesManagement
         /// <summary> Get process memory usage. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> Process memory usage. </returns>
-        private static long GetProcessMemoryUsage(Process process)
+        private long GetProcessMemoryUsage(Process process)
         {
             PROCESS_MEMORY_COUNTERS_EX counters = new PROCESS_MEMORY_COUNTERS_EX();
 
@@ -232,7 +197,7 @@ namespace SystemController.ProcessesManagement
         /// <summary> Get process mode. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> Process mode. </returns>
-        private static ProcessMode GetProcessMode(Process process)
+        private ProcessMode GetProcessMode(Process process)
         {
             if (Environment.Is64BitOperatingSystem)
             {
@@ -269,7 +234,7 @@ namespace SystemController.ProcessesManagement
         /// <summary> Get process username. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> Process username. </returns>
-        private static string GetProcessUserName(Process process)
+        private string GetProcessUserName(Process process)
         {
             IntPtr processHandle = IntPtr.Zero;
 
@@ -315,10 +280,35 @@ namespace SystemController.ProcessesManagement
         }
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Check if process has any window. </summary>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - process has any window; False - otherwise. </returns>
+        private bool HasWindows(Process process)
+        {
+            bool anyWindow = false;
+            IntPtr mainWindowHandle = process.MainWindowHandle;
+
+            if (mainWindowHandle != IntPtr.Zero)
+                return true;
+
+            foreach (ProcessThread thread in process.Threads)
+            {
+                EnumThreadWindows(thread.Id, (hWnd, lParam) =>
+                {
+                    anyWindow = true;
+                    return true;
+                },
+                IntPtr.Zero);
+            }
+
+            return anyWindow;
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Is process system process. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> True - is system process; False - otherwise. </returns>
-        private static bool IsSystemProcess(Process process, string processUserName)
+        private bool IsSystemProcess(Process process, string processUserName)
         {
             bool hasSystemCharacteristics = process.PriorityClass == ProcessPriorityClass.High
                 && process.Id <= 4;
@@ -326,6 +316,41 @@ namespace SystemController.ProcessesManagement
             bool isSystemAccount = processUserName.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase);
 
             return hasSystemCharacteristics || isSystemAccount;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Get list of processes. </summary>
+        /// <returns> List of processes. </returns>
+        public List<ProcessInfo> GetProcesses()
+        {
+            List<ProcessInfo> processes = new List<ProcessInfo>();
+
+            foreach (Process process in Process.GetProcesses())
+            {
+                var processUserName = GetProcessUserName(process);
+
+                ProcessInfo processInfo = new ProcessInfo()
+                {
+                    Id = process.Id,
+                    Name = process.ProcessName,
+                    Description = process.MainWindowTitle,
+                    Type = process.MainWindowHandle == IntPtr.Zero ? "Background Process" : "Application",
+                    CommandLocation = process.MainModule?.FileName,
+                    CPUUsage = GetProcessCPUUsage(process),
+                    MemoryUsage = GetProcessMemoryUsage(process),
+                    HasWindows = HasWindows(process),
+                    IsSystemService = IsSystemProcess(process, processUserName),
+                    Mode = GetProcessMode(process),
+                    Priority = ProcessPriorityClass.Normal,
+                    ThreadCount = process.Threads.Count,
+                    Uptime = GetProcessUptime(process),
+                    UserName = processUserName,
+                };
+
+                processes.Add(processInfo);
+            }
+
+            return processes;
         }
 
         //  --------------------------------------------------------------------------------
@@ -395,7 +420,7 @@ namespace SystemController.ProcessesManagement
         /// <summary> Get window class name. </summary>
         /// <param name="hWnd"> Window handle pointer. </param>
         /// <returns> Window class name. </returns>
-        public string GetWindowClassName(IntPtr hWnd)
+        private string GetWindowClassName(IntPtr hWnd)
         {
             StringBuilder className = new StringBuilder(256);
             GetClassName(hWnd, className, className.Capacity);

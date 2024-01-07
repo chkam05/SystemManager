@@ -19,28 +19,13 @@ namespace SystemController.ProcessesManagement.Data
         public string? CommandLocation { get; set; }
         public double CPUUsage { get; set; }
         public long MemoryUsage { get; set; }
+        public bool HasWindows { get; set; }
         public bool IsSystemService { get; set; }
         public ProcessMode Mode { get; set; }
         public ProcessPriorityClass Priority { get; set; }
         public int ThreadCount { get; set; }
         public TimeSpan Uptime { get; set; }
-        public string UserName { get; set; }
-        public List<WindowInfo> Windows { get; set; }
-
-
-        //  METHODS
-
-        #region CLASS METHODS
-
-        //  --------------------------------------------------------------------------------
-        /// <summary> ProcessInfo class constructor. </summary>
-        /// <param name="windows"> List of process windows. </param>
-        public ProcessInfo(List<WindowInfo>? windows = null)
-        {
-            Windows = windows ?? new List<WindowInfo>();
-        }
-
-        #endregion CLASS METHODS
+        public string? UserName { get; set; }
 
     }
 }
