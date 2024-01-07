@@ -1,0 +1,43 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration">
+
+    <!-- STATIC -->
+
+    <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+
+
+    <!-- STYLE -->
+
+    <Style x:Key="ComboBoxItemExStyle" TargetType="{x:Type cex:ComboBoxItemEx}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBackground" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBorderBrush" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverForeground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedBackground" Value="{Binding AccentSelectedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedBorderBrush" Value="{Binding AccentSelectedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedForeground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+    </Style>
+
+    <Style x:Key="ComboBoxExStyle" TargetType="{x:Type cex:ComboBoxEx}">
+        <Setter Property="Background" Value="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="BorderBrush" Value="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="Foreground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="DropDownBackground" Value="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="DropDownBorderBrush" Value="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="DropDownForeground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="DropDownIconBrush" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ComboBoxItemExStyle}"/>
+        <Setter Property="MouseOverBackground" Value="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBorderBrush" Value="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverForeground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedBackground" Value="{Binding AccentSelectedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedBorderBrush" Value="{Binding AccentSelectedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedForeground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+    </Style>
+
+</ResourceDictionary>

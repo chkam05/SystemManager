@@ -1,0 +1,32 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration">
+
+    <!-- STATIC -->
+
+    <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+
+
+    <!-- STYLE -->
+
+    <Style x:Key="MenuItemExStyle" TargetType="{x:Type cex:MenuItemEx}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBackground" Value="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBorderBrush" Value="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverForeground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+    </Style>
+
+    <Style x:Key="MenuExStyle" TargetType="{x:Type cex:MenuEx}">
+        <Setter Property="Background" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="BorderBrush" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SubMenuBackground" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SubMenuBorderBrush" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+    </Style>
+
+</ResourceDictionary>

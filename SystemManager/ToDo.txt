@@ -1,0 +1,25 @@
+﻿MACRO RUNNER:
+	- BackgroundWorker logic
+
+PROCESSES
+	- Porcesses detector
+	- Windows detector
+	- Getting Handles
+
+FILES
+	- Files listing
+	- Copying files
+	- Moving files
+	- Opening and Saving text files
+
+SCREENSHOT
+	- To File
+	- To Memory
+
+CLIPBOARD
+	- Read
+	- Write
+
+REGEIDT
+	- Read
+	- Write

@@ -1,0 +1,38 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:ctrls="clr-namespace:SystemManager.Controls">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/ButtonExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/ComboBoxExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/ContextMenuExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/ListViewExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/MenuExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/ScrollViewerExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/TextBoxExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/UpDownTextBoxExStyle.xaml"/>
+        
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Controls/MainMenuControlStyle.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}"/>
+    <Style BasedOn="{StaticResource ComboBoxItemExStyle}" TargetType="{x:Type cex:ComboBoxItemEx}"/>
+    <Style BasedOn="{StaticResource ComboBoxExStyle}" TargetType="{x:Type cex:ComboBoxEx}"/>
+    <Style BasedOn="{StaticResource ContextMenuSeparatorStyle}" TargetType="{x:Type Separator}"/>
+    <Style BasedOn="{StaticResource ContextMenuItemExStyle}" TargetType="{x:Type cex:ContextMenuItemEx}"/>
+    <Style BasedOn="{StaticResource ContextMenuExStyle}" TargetType="{x:Type cex:ContextMenuEx}"/>
+    <Style BasedOn="{StaticResource ListViewItemExStyle}" TargetType="{x:Type cex:ListViewItemEx}"/>
+    <Style BasedOn="{StaticResource ListViewExStyle}" TargetType="{x:Type cex:ListViewEx}"/>
+    <Style BasedOn="{StaticResource MenuItemExStyle}" TargetType="{x:Type cex:MenuItemEx}"/>
+    <Style BasedOn="{StaticResource MenuExStyle}" TargetType="{x:Type cex:MenuEx}"/>
+    <Style BasedOn="{StaticResource ScrollViewerExStyle}" TargetType="{x:Type cex:ScrollViewerEx}"/>
+    <Style BasedOn="{StaticResource TextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}"/>
+    <Style BasedOn="{StaticResource UpDownTextBoxExStyle}" TargetType="{x:Type cex:UpDownTextBoxEx}"/>
+    <Style BasedOn="{StaticResource UpDownDoubleTextBoxExStyle}" TargetType="{x:Type cex:UpDownDoubleTextBoxEx}"/>
+    <Style BasedOn="{StaticResource UpDownLongTextBoxExStyle}" TargetType="{x:Type cex:UpDownLongTextBoxEx}"/>
+
+    <Style BasedOn="{StaticResource MainMenuControlStyle}" TargetType="{x:Type ctrls:MainMenuControl}"/>
+
+</ResourceDictionary>

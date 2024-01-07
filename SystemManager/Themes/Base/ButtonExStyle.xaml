@@ -1,0 +1,32 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration">
+
+    <!-- STATIC -->
+
+    <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+
+
+    <!-- STYLE -->
+
+    <Style x:Key="ButtonExStyle" TargetType="{x:Type cex:ButtonEx}">
+        <Setter Property="Background" Value="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="BorderBrush" Value="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Foreground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="IconHeight" Value="24"/>
+        <Setter Property="IconMargin" Value="0,0,16,0"/>
+        <Setter Property="IconWidth" Value="24"/>
+        <Setter Property="Margin" Value="2,0"/>
+        <Setter Property="MouseOverBackground" Value="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBorderBrush" Value="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverForeground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="PressedBackground" Value="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="PressedBorderBrush" Value="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="PressedForeground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+    </Style>
+
+</ResourceDictionary>

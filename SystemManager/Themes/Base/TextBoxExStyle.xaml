@@ -1,0 +1,27 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration">
+
+    <!-- STATIC -->
+
+    <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+
+
+    <!-- STYLE -->
+
+    <Style x:Key="TextBoxExStyle" TargetType="{x:Type cex:TextBoxEx}">
+        <Setter Property="Background" Value="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="BorderBrush" Value="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBackground" Value="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverBorderBrush" Value="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="MouseOverForeground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedBackground" Value="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedBorderBrush" Value="{Binding AccentSelectedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedForeground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+        <Setter Property="SelectedTextBackground" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+    </Style>
+
+</ResourceDictionary>

@@ -1,0 +1,77 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:ctrls="clr-namespace:SystemManager.Controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <!-- STATIC -->
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/ListViewExStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/SystemManager;component/Themes/Base/ScrollViewerExStyle.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+    
+    <!-- DATA TEMPLATE -->
+
+    <DataTemplate x:Key="MainMenuItemDataTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <materialDesign:PackIcon
+                Grid.Column="0"
+                Height="24"
+                Kind="{Binding Icon}"
+                VerticalAlignment="Center"
+                Width="24"/>
+
+            <StackPanel
+                Grid.Column="1"
+                Margin="8,0,0,0"
+                Orientation="Vertical"
+                VerticalAlignment="Center">
+
+                <TextBlock
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Text="{Binding Title}"/>
+
+                <TextBlock
+                    Margin="0,4,0,0"
+                    Text="{Binding Description}"
+                    TextWrapping="WrapWithOverflow"/>
+
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+    
+
+    <!-- CONTROL TEMPLATE -->
+
+    <ControlTemplate x:Key="MainMenuControlControlTemplate" TargetType="{x:Type ctrls:MainMenuControl}">
+        <cex:ScrollViewerEx
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            
+            <cex:ListViewEx
+                x:Name="PART_ListViewEx"
+                ItemsSource="{TemplateBinding MenuItems}"
+                ItemTemplate="{StaticResource MainMenuItemDataTemplate}"
+                SelectionMode="Single"/>
+        </cex:ScrollViewerEx>
+    </ControlTemplate>
+    
+    
+    <!-- STYLE -->
+
+    <Style x:Key="MainMenuControlStyle" TargetType="{x:Type ctrls:MainMenuControl}">
+        <Setter Property="Template" Value="{StaticResource MainMenuControlControlTemplate}"/>
+    </Style>
+
+</ResourceDictionary>

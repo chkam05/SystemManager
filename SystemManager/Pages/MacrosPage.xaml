@@ -1,0 +1,739 @@
+﻿<Page
+    x:Class="SystemManager.Pages.MacrosPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SystemManager.Pages"
+    xmlns:macroConv="clr-namespace:SystemManager.Data.Macros.Converters"
+    xmlns:macros="clr-namespace:SystemManager.Data.Macros"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:sysConData="clr-namespace:SystemController.MouseKeyboard.Data;assembly=SystemController"
+    xmlns:System="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    
+    Background="Transparent"
+    Foreground="White">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- STATIC -->
+            
+            <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+
+            <ObjectDataProvider x:Key="MouseButtonEnumItems" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="sysConData:MouseButton"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+
+            <!-- CONVERTERS -->
+
+            <macroConv:MacroKeyCombinationNameConverter x:Key="MacroKeyCombinationNameConverter"/>
+            <macroConv:MacroKeyNameConverter x:Key="MacroKeyNameConverter"/>
+            <macroConv:MacroTypeIconKindConverter x:Key="MacroTypeIconKindConverter"/>
+            <macroConv:MacroTypeNameConverter x:Key="MacroTypeNameConverter"/>
+            <macroConv:MouseButtonNameConverter x:Key="MouseButtonNameConverter"/>
+
+
+            <!-- STYLES -->
+
+            <Style x:Key="MacroItemComboBoxExStyle" BasedOn="{StaticResource ComboBoxExStyle}" TargetType="{x:Type cex:ComboBoxEx}">
+                <Setter Property="ItemsSource" Value="{Binding Source={StaticResource MouseButtonEnumItems}}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="128"/>
+            </Style>
+
+            <Style x:Key="MacroItemTextBoxExStyle" BasedOn="{StaticResource TextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
+                <Setter Property="IsReadOnly" Value="True"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="64"/>
+            </Style>
+
+            <Style x:Key="MacroItemUpDownDoubleTextBoxExStyle" BasedOn="{StaticResource UpDownDoubleTextBoxExStyle}" TargetType="{x:Type cex:UpDownDoubleTextBoxEx}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="64"/>
+            </Style>
+
+            <Style x:Key="MacroItemUpDownLongTextBoxExStyle" BasedOn="{StaticResource UpDownLongTextBoxExStyle}" TargetType="{x:Type cex:UpDownLongTextBoxEx}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="64"/>
+            </Style>
+
+            <Style x:Key="StatusBarPackIconStyle" TargetType="materialDesign:PackIcon">
+                <Setter Property="Height" Value="16"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="16"/>
+            </Style>
+
+            <Style x:Key="StatusBarTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="8,0,0,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StatusBarValueTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="2,0,0,0"/>
+                <Setter Property="MinWidth" Value="32"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            
+
+            <!-- DATA TEMPLATES -->
+
+            <DataTemplate x:Key="MacroItemTemplate">
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Header -->
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+
+                        <Border
+                            Background="Transparent"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            Cursor="SizeAll"
+                            PreviewMouseDown="MacroItemHandlerPreviewMouseDown"
+                            PreviewMouseUp="MacroItemHandlerPreviewMouseUp"
+                            PreviewMouseMove="MacroItemHandlerPreviewMouseMove">
+
+                            <materialDesign:PackIcon
+                                Kind="DotsVertical"
+                                VerticalAlignment="Center"/>
+
+                        </Border>
+
+                        <materialDesign:PackIcon
+                            Height="24"
+                            Kind="{Binding MacroType, Mode=OneWay, Converter={StaticResource MacroTypeIconKindConverter}}"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Width="24"/>
+
+                        <TextBlock
+                            Margin="8,0,8,0"
+                            Text="{Binding MacroType, Mode=OneWay, Converter={StaticResource MacroTypeNameConverter}}"
+                            VerticalAlignment="Center"/>
+
+                    </StackPanel>
+
+                    <!-- MacroDelay Item -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.Delay}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <cex:UpDownLongTextBoxEx>
+                            <cex:UpDownLongTextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemUpDownLongTextBoxExStyle}" TargetType="{x:Type cex:UpDownLongTextBoxEx}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="Value" Value="0"/>
+                                    
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.Delay}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Value" Value="{Binding DelayMiliseconds}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:UpDownLongTextBoxEx.Style>
+                        </cex:UpDownLongTextBoxEx>
+
+                        <TextBlock
+                            Margin="8,0,0,0"
+                            Text="miliseconds."
+                            VerticalAlignment="Center"/>
+
+                    </StackPanel>
+
+                    <!-- MacroKey Item -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyDown}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyUp}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyClick}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <cex:TextBoxEx>
+                            <cex:TextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemTextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="Text" Value=""/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyDown}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Text" Value="{Binding KeyCode, Mode=OneWay, Converter={StaticResource MacroKeyNameConverter}}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyUp}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Text" Value="{Binding KeyCode, Mode=OneWay, Converter={StaticResource MacroKeyNameConverter}}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyClick}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Text" Value="{Binding KeyCode, Mode=OneWay, Converter={StaticResource MacroKeyNameConverter}}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:TextBoxEx.Style>
+                        </cex:TextBoxEx>
+
+                    </StackPanel>
+
+                    <!-- MacroKeyCombination Item -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyCombination}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <cex:TextBoxEx>
+                            <cex:TextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemTextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="Text" Value=""/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyCombination}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Text" Value="{Binding KeyCodes, Mode=OneWay,Converter={StaticResource MacroKeyCombinationNameConverter}}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:TextBoxEx.Style>
+                        </cex:TextBoxEx>
+
+                    </StackPanel>
+
+                    <!-- MacroMouse Item -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseDown}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseUp}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseClick}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <cex:ComboBoxEx>
+                            <cex:ComboBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemComboBoxExStyle}" TargetType="{x:Type cex:ComboBoxEx}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="SelectedItem" Value="{x:Null}"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseDown}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="SelectedItem" Value="{Binding MouseButton}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseUp}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="SelectedItem" Value="{Binding MouseButton}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseClick}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="SelectedItem" Value="{Binding MouseButton}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:ComboBoxEx.Style>
+                        </cex:ComboBoxEx>
+
+                    </StackPanel>
+
+                    <!-- MacroMouseMove Item -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseMove}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <cex:UpDownDoubleTextBoxEx>
+                            <cex:UpDownDoubleTextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemUpDownDoubleTextBoxExStyle}" TargetType="{x:Type cex:UpDownDoubleTextBoxEx}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="Value" Value="0"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseMove}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Value" Value="{Binding X}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:UpDownDoubleTextBoxEx.Style>
+                        </cex:UpDownDoubleTextBoxEx>
+
+                        <TextBlock
+                            Margin="8,0"
+                            Text="x"
+                            VerticalAlignment="Center"/>
+
+                        <cex:UpDownDoubleTextBoxEx>
+                            <cex:UpDownDoubleTextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemUpDownDoubleTextBoxExStyle}" TargetType="{x:Type cex:UpDownDoubleTextBoxEx}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="Value" Value="0"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseMove}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Value" Value="{Binding Y}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:UpDownDoubleTextBoxEx.Style>
+                        </cex:UpDownDoubleTextBoxEx>
+
+                    </StackPanel>
+
+                    <!-- MacroMouseScroll Item -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseScrollHorizontal}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseScrollVertical}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <cex:UpDownLongTextBoxEx>
+                            <cex:UpDownLongTextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemUpDownLongTextBoxExStyle}" TargetType="{x:Type cex:UpDownLongTextBoxEx}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Setter Property="Value" Value="0"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseScrollHorizontal}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Value" Value="{Binding ScrollShift}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseScrollVertical}">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                            <Setter Property="Value" Value="{Binding ScrollShift}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:UpDownLongTextBoxEx.Style>
+                        </cex:UpDownLongTextBoxEx>
+
+                    </StackPanel>
+
+                    <!-- Buttons -->
+                    <StackPanel
+                        Grid.Column="2"
+                        Margin="8,0,0,0"
+                        Orientation="Horizontal">
+
+                        <Border
+                            Background="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                            BorderBrush="{x:Null}"
+                            BorderThickness="0"
+                            Margin="8,4"
+                            VerticalAlignment="Stretch"
+                            Width="1"/>
+
+                        <cex:ButtonEx
+                            Content="Capture Keys"
+                            IconKind="Keyboard"
+                            Margin="0,0,8,0"
+                            Click="CaptureKeyMacroItemButtonExClick">
+
+                            <cex:ButtonEx.Style>
+                                <Style BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                                    <Setter Property="Visibility" Value="Hidden" />
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyDown}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyUp}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyClick}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.KeyCombination}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:ButtonEx.Style>
+
+                        </cex:ButtonEx>
+
+                        <cex:ButtonEx
+                            IconKind="BinOutline"
+                            Click="RemoveMacroItemButtonExClick"/>
+
+                    </StackPanel>
+
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Border
+        Background="White"
+        BorderBrush="{x:Null}"
+        BorderThickness="0">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Border
+                Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                BorderBrush="{x:Null}"
+                BorderThickness="0"
+                Grid.Row="0"
+                Padding="8">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+
+                        <cex:ButtonEx
+                            IconKind="File"
+                            Click="FileButtonExClick">
+
+                            <cex:ButtonEx.Content>
+                                <StackPanel
+                                    Orientation="Horizontal">
+
+                                    <TextBlock
+                                        Margin="0,0,8,0"
+                                        Text="File"/>
+
+                                    <Border
+                                        Background="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                                        BorderThickness="0"
+                                        Width="1"/>
+
+                                    <materialDesign:PackIcon
+                                        Kind="ChevronDown"/>
+
+                                </StackPanel>
+                            </cex:ButtonEx.Content>
+
+                            <cex:ButtonEx.ContextMenu>
+                                <cex:ContextMenuEx>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="New"
+                                        IconKind="FileOutline"
+                                        Click="FileNewContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Open"
+                                        IconKind="FolderOpen"
+                                        Click="FileOpenContextMenuItemExClick"/>
+
+                                    <Separator/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Save"
+                                        IconKind="ContentSave"
+                                        Click="FileSaveContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Save As"
+                                        IconKind="ContentSaveEdit"
+                                        Click="FileSaveAsContextMenuItemExClick"/>
+
+                                </cex:ContextMenuEx>
+                            </cex:ButtonEx.ContextMenu>
+
+                        </cex:ButtonEx>
+
+                        <cex:ButtonEx
+                            IconKind="Add"
+                            Click="AddMacroItemButtonExClick">
+
+                            <cex:ButtonEx.Content>
+                                <StackPanel
+                                    Orientation="Horizontal">
+
+                                    <TextBlock
+                                        Margin="0,0,8,0"
+                                        Text="Add macro item"/>
+
+                                    <Border
+                                        Background="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                                        BorderThickness="0"
+                                        Width="1"/>
+
+                                    <materialDesign:PackIcon
+                                        Kind="ChevronDown"/>
+
+                                </StackPanel>
+                            </cex:ButtonEx.Content>
+
+                            <cex:ButtonEx.ContextMenu>
+                                <cex:ContextMenuEx>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Delay"
+                                        IconKind="TimerOutline"
+                                        Click="AddMacroDelayContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Key Down"
+                                        IconKind="KeyboardOutline"
+                                        Click="AddMacroKeyDownContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Key Up"
+                                        IconKind="KeyboardOutline"
+                                        Click="AddMacroKeyUpContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Key Click"
+                                        IconKind="KeyboardOutline"
+                                        Click="AddMacroKeyClickContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Key Combination"
+                                        IconKind="KeyboardOutline"
+                                        Click="AddMacroKeyCombinationContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Mouse Button Down"
+                                        IconKind="MouseMoveDown"
+                                        Click="AddMacroMouseDownContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Mouse Button Up"
+                                        IconKind="MouseMoveUp"
+                                        Click="AddMacroMouseUpContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Mouse Button Click"
+                                        IconKind="Mouse"
+                                        Click="AddMacroMouseClickContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Mouse Move"
+                                        IconKind="MouseVariant"
+                                        Click="AddMacroMouseMoveContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Mouse Scroll Horizontal"
+                                        IconKind="MouseMoveVertical"
+                                        Click="AddMacroMouseScrollHorizontalContextMenuItemExClick"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Mouse Scroll Vertical"
+                                        IconKind="MouseMoveVertical"
+                                        Click="AddMacroMouseScrollVerticalContextMenuItemExClick"/>
+
+                                </cex:ContextMenuEx>
+                            </cex:ButtonEx.ContextMenu>
+
+                        </cex:ButtonEx>
+
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+
+                        <cex:ButtonEx
+                            IconKind="Play"
+                            Click="RunMacroButtonExClick"/>
+
+                    </StackPanel>
+
+                </Grid>
+
+            </Border>
+
+            <cex:ListViewEx
+                x:Name="_macroItemsListView"
+                Grid.Row="1"
+                ItemsSource="{Binding MacroItems}"
+                ItemTemplate="{StaticResource MacroItemTemplate}"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                SelectionChanged="MacroItemsListViewSelectionChanged">
+                <cex:ListViewEx.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource ListViewItemExStyle}" TargetType="{x:Type cex:ListViewItemEx}">
+                        <Setter Property="AllowDrop" Value="True"/>
+                        <EventSetter Event="Drop" Handler="MacroItemListViewItemExDrop"/>
+                        <EventSetter Event="DragEnter" Handler="MacroItemListViewItemExDragEnter"/>
+                    </Style>
+                </cex:ListViewEx.ItemContainerStyle>
+            </cex:ListViewEx>
+
+            <Border
+                Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                BorderBrush="{x:Null}"
+                BorderThickness="0"
+                Grid.Row="2"
+                Padding="8">
+
+                <StackPanel
+                    Orientation="Horizontal">
+
+                    <materialDesign:PackIcon
+                        Kind="Mouse"
+                        Style="{StaticResource StatusBarPackIconStyle}"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarTextBlockStyle}"
+                        Text="X:"/>
+                    
+                    <TextBlock
+                        Style="{StaticResource StatusBarValueTextBlockStyle}"
+                        Text="{Binding MousePositionX, Mode=OneWay}"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarTextBlockStyle}"
+                        Text="Y:"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarValueTextBlockStyle}"
+                        Text="{Binding MousePositionY, Mode=OneWay}"/>
+
+                    <materialDesign:PackIcon
+                        Kind="CursorDefaultClick"
+                        Margin="8,0,0,0"
+                        Style="{StaticResource StatusBarPackIconStyle}"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarValueTextBlockStyle}"
+                        Text="{Binding MouseButton, Mode=OneWay, Converter={StaticResource MouseButtonNameConverter}}"/>
+
+                    <materialDesign:PackIcon
+                        Kind="ChevronUpDown"
+                        Margin="8,0,0,0"
+                        Style="{StaticResource StatusBarPackIconStyle}"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarTextBlockStyle}"
+                        Text="X:"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarValueTextBlockStyle}"
+                        Text="{Binding MouseScrollX, Mode=OneWay}"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarTextBlockStyle}"
+                        Text="Y:"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarValueTextBlockStyle}"
+                        Text="{Binding MouseScrollY, Mode=OneWay}"/>
+
+                    <materialDesign:PackIcon
+                        Kind="KeyboardOutline"
+                        Margin="8,0,0,0"
+                        Style="{StaticResource StatusBarPackIconStyle}"/>
+
+                    <TextBlock
+                        Style="{StaticResource StatusBarValueTextBlockStyle}"
+                        Text="{Binding KeyCodes, Mode=OneWay, Converter={StaticResource MacroKeyCombinationNameConverter}}"/>
+
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+        
+    </Border>
+    
+</Page>

@@ -1,0 +1,71 @@
+﻿<cexWin:WindowEx
+    x:Class="SystemManager.Windows.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ctrls="clr-namespace:SystemManager.Controls"
+    xmlns:cexIM="clr-namespace:chkam05.Tools.ControlsEx.InternalMessages;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cexWin="clr-namespace:chkam05.Tools.ControlsEx.WindowsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:local="clr-namespace:SystemManager.Windows"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    
+    Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    BackgroundOpacity="1"
+    BorderBrush="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    DataContext="{Binding RelativeSource={RelativeSource self}}"
+    Foreground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    Height="450"
+    IconKind="MicrosoftWindows"
+    MouseOverTitleBarButtonBackground="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    MouseOverTitleBarButtonForeground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    PressedTitleBarButtonBackground="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    PressedTitleBarButtonForeground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    Title="MainWindow"
+    Width="800"
+    Loaded="WindowLoaded">
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="224"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <ctrls:MainMenuControl
+            Grid.Column="0"
+            MenuItems="{Binding MainMenuItems}"/>
+
+        <Border
+            Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+            BorderBrush="{x:Null}"
+            BorderThickness="0"
+            Grid.Column="1"
+            Width="10">
+
+            <materialDesign:PackIcon
+                Foreground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                Height="16"
+                HorizontalAlignment="Center"
+                Kind="DotsVertical"
+                VerticalAlignment="Center"
+                Width="16"/>
+
+        </Border>
+
+        <ctrls:PagesControl
+            x:Name="_pagesControl"
+            Grid.Column="2"/>
+
+        <cexIM:InternalMessagesExContainer
+            x:Name="_internalMessagesExContainer"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"/>
+
+    </Grid>
+
+</cexWin:WindowEx>
