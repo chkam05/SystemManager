@@ -224,7 +224,7 @@ namespace SystemManager.Data.Macros
         /// <param name="overwrite"> Overwrite previous loaded file. </param>
         public void SaveMacroItems(string? filePath, bool overwrite = false)
         {
-            var saveFilePath = CanSaveCurrent ? _currentFilePath : filePath;
+            var saveFilePath = (CanSaveCurrent && overwrite) ? _currentFilePath : filePath;
 
             if (!string.IsNullOrEmpty(saveFilePath))
             {

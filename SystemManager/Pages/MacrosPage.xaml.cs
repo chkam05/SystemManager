@@ -28,11 +28,19 @@ using static chkam05.Tools.ControlsEx.Events.Delegates;
 using SystemManager.Data.Macros.Events;
 using SystemManager.Controls;
 using System.Reflection;
+using System.Globalization;
 
 namespace SystemManager.Pages
 {
     public partial class MacrosPage : Page
     {
+
+        //  CONST
+
+        public const int MACRO_DELAY_INCREASE = 1000;
+        public const int MACRO_MOUSE_MOVE_INCREASE = 10;
+        public const int MACRO_MOUSE_SCROLL_INCREASE = 1000;
+
 
         //  VARIABLES
 
@@ -599,6 +607,74 @@ namespace SystemManager.Pages
             }
         }
 
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after clicking ValuePlus ButtonEx. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Routed Event Arguments. </param>
+        private void ValuePlusButtonExClick(object sender, RoutedEventArgs e)
+        {
+            var frameworkElement = e.Source as FrameworkElement;
+            var dataContext = frameworkElement?.DataContext;
+
+            if (dataContext is MacroDelay macroDelay)
+            {
+                macroDelay.DelayMiliseconds = macroDelay.DelayMiliseconds + MACRO_DELAY_INCREASE;
+            }
+            else if (dataContext is MacroMouseMove macroMouseMove)
+            {
+                if (frameworkElement?.Name == "_plusXButtonEx")
+                {
+                    macroMouseMove.X = macroMouseMove.X + MACRO_MOUSE_MOVE_INCREASE;
+                }
+                else if (frameworkElement?.Name == "_plusYButtonEx")
+                {
+                    macroMouseMove.Y = macroMouseMove.Y + MACRO_MOUSE_MOVE_INCREASE;
+                }
+            }
+            else if (dataContext is MacroMouseScrollHorizontal macroMouseScrollHorizontal)
+            {
+                macroMouseScrollHorizontal.ScrollShift = macroMouseScrollHorizontal.ScrollShift + MACRO_MOUSE_SCROLL_INCREASE;
+            }
+            else if (dataContext is MacroMouseScrollVertical macroMouseScrollVertical)
+            {
+                macroMouseScrollVertical.ScrollShift = macroMouseScrollVertical.ScrollShift + MACRO_MOUSE_SCROLL_INCREASE;
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after clicking ValueMinus ButtonEx. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Routed Event Arguments. </param>
+        private void ValueMonusButtonExClick(object sender, RoutedEventArgs e)
+        {
+            var frameworkElement = e.Source as FrameworkElement;
+            var dataContext = frameworkElement?.DataContext;
+
+            if (dataContext is MacroDelay macroDelay)
+            {
+                macroDelay.DelayMiliseconds = macroDelay.DelayMiliseconds - MACRO_DELAY_INCREASE;
+            }
+            else if (dataContext is MacroMouseMove macroMouseMove)
+            {
+                if (frameworkElement?.Name == "_minusXButtonEx")
+                {
+                    macroMouseMove.X = macroMouseMove.X - MACRO_MOUSE_MOVE_INCREASE;
+                }
+                else if (frameworkElement?.Name == "_minusYButtonEx")
+                {
+                    macroMouseMove.Y = macroMouseMove.Y + MACRO_MOUSE_MOVE_INCREASE;
+                }
+            }
+            else if (dataContext is MacroMouseScrollHorizontal macroMouseScrollHorizontal)
+            {
+                macroMouseScrollHorizontal.ScrollShift = macroMouseScrollHorizontal.ScrollShift - MACRO_MOUSE_SCROLL_INCREASE;
+            }
+            else if (dataContext is MacroMouseScrollVertical macroMouseScrollVertical)
+            {
+                macroMouseScrollVertical.ScrollShift = macroMouseScrollVertical.ScrollShift - MACRO_MOUSE_SCROLL_INCREASE;
+            }
+        }
+
         #endregion MACRO ITEMS MANAGEMENT METHODS
 
         #region MACRO RUNNER METHODS
@@ -689,6 +765,92 @@ namespace SystemManager.Pages
         }
 
         #endregion SHORTCUT METHODS
+
+        #region TEXT BOXES FORMATTING METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after preview key press in LongNumeric TextBoxEx. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Key Event Arguments. </param>
+        private void LongNumericTextBoxExPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = !IsNumericKey(e.Key, false, false);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after preview inputed text in LongNumeric TextBoxEx. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Text Composition Event Arguments. </param>
+        private void LongNumericTextBoxExPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !IsNumeric(e.Text, false, false);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after preview key press in DoubleNumeric TextBoxEx. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Key Event Arguments. </param>
+        private void DoubleNumericTextBoxExPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = !IsNumericKey(e.Key, true, true);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after preview inputed text in DoubleNumeric TextBoxEx. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Text Composition Event Arguments. </param>
+        private void DoubleNumericTextBoxExPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !IsNumeric(e.Text, true, true);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if text is numeric. </summary>
+        /// <param name="input"> Text. </param>
+        /// <param name="allowDecimal"> Allow decimal numbers. </param>
+        /// <param name="allowNegative"> Allow negative numbers. </param>
+        /// <returns> True - text is numeric; False - otherwise. </returns>
+        private bool IsNumeric(string input, bool allowDecimal, bool allowNegative)
+        {
+            if (string.IsNullOrEmpty(input))
+                return false;
+
+            char decSeparator = Convert.ToChar(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+
+            if (input == decSeparator.ToString())
+                return allowDecimal;
+
+            if (input == "-")
+                return allowNegative;
+
+            double result;
+
+            var parseResult = double.TryParse(input, out result)
+                && (input.Contains(decSeparator.ToString()) ? allowDecimal : true)
+                && (result < 0 ? allowNegative : true);
+
+            return parseResult;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if key is numeric. </summary>
+        /// <param name="key"> Key pressed. </param>
+        /// <param name="allowDecimal"> Allow decimal numbers. </param>
+        /// <param name="allowNegative"> Allow negative numbers. </param>
+        /// <returns> True - key is numeric; False - otherwise. </returns>
+        private bool IsNumericKey(Key key, bool allowDecimal, bool allowNegative)
+        {
+            return key == Key.Enter
+                || key == Key.Tab
+                || key == Key.Back
+                || key == Key.Delete
+                || (key >= Key.D0 && key <= Key.D9)
+                || (key >= Key.NumPad0 && key <= Key.NumPad9)
+                || (allowDecimal && key == Key.Decimal)
+                || (allowNegative && key == Key.Subtract);
+        }
+
+        #endregion TEXT BOXES FORMATTING METHODS
 
     }
 }

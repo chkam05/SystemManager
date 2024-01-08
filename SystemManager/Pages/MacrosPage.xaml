@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
     xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:conv="clr-namespace:SystemManager.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SystemManager.Pages"
     xmlns:macroConv="clr-namespace:SystemManager.Data.Macros.Converters"
@@ -40,6 +41,8 @@
 
             <!-- CONVERTERS -->
 
+            <conv:StringDoubleConverter x:Key="StringDoubleConverter"/>
+            <conv:StringLongConverter x:Key="StringLongConverter"/>
             <macroConv:MacroKeyCombinationNameConverter x:Key="MacroKeyCombinationNameConverter"/>
             <macroConv:MacroKeyNameConverter x:Key="MacroKeyNameConverter"/>
             <macroConv:MacroRunnerStateIconKindConverter x:Key="MacroRunnerStateIconKindConverter"/>
@@ -50,24 +53,28 @@
 
             <!-- STYLES -->
 
+            <Style x:Key="MacroItemToolButtonExStyle" BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="Height" Value="28"/>
+                <Setter Property="MinHeight" Value="28"/>
+                <Setter Property="MinWidth" Value="28"/>
+                <Setter Property="Margin" Value="4,0"/>
+                <Setter Property="Width" Value="28"/>
+            </Style>
+            
             <Style x:Key="MacroItemComboBoxExStyle" BasedOn="{StaticResource ComboBoxExStyle}" TargetType="{x:Type cex:ComboBoxEx}">
                 <Setter Property="ItemsSource" Value="{Binding Source={StaticResource MouseButtonEnumItems}}"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Width" Value="128"/>
             </Style>
 
+            <Style x:Key="MacroItemNumericTextBoxExStyle" BasedOn="{StaticResource TextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Width" Value="64"/>
+            </Style>
+
             <Style x:Key="MacroItemTextBoxExStyle" BasedOn="{StaticResource TextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
                 <Setter Property="IsReadOnly" Value="True"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Width" Value="64"/>
-            </Style>
-
-            <Style x:Key="MacroItemUpDownDoubleTextBoxExStyle" BasedOn="{StaticResource UpDownDoubleTextBoxExStyle}" TargetType="{x:Type cex:UpDownDoubleTextBoxEx}">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Width" Value="64"/>
-            </Style>
-
-            <Style x:Key="MacroItemUpDownLongTextBoxExStyle" BasedOn="{StaticResource UpDownLongTextBoxExStyle}" TargetType="{x:Type cex:UpDownLongTextBoxEx}">
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Width" Value="64"/>
             </Style>
@@ -152,21 +159,33 @@
                             </Style>
                         </StackPanel.Style>
 
-                        <cex:UpDownLongTextBoxEx>
-                            <cex:UpDownLongTextBoxEx.Style>
-                                <Style BasedOn="{StaticResource MacroItemUpDownLongTextBoxExStyle}" TargetType="{x:Type cex:UpDownLongTextBoxEx}">
+                        <cex:ButtonEx
+                            IconKind="Plus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValuePlusButtonExClick"/>
+
+                        <cex:TextBoxEx
+                            PreviewKeyDown="LongNumericTextBoxExPreviewKeyDown"
+                            PreviewTextInput="LongNumericTextBoxExPreviewTextInput">
+                            <cex:TextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemNumericTextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
                                     <Setter Property="IsEnabled" Value="False"/>
-                                    <Setter Property="Value" Value="0"/>
-                                    
+                                    <Setter Property="Margin" Value="0"/>
+
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.Delay}">
                                             <Setter Property="IsEnabled" Value="True"/>
-                                            <Setter Property="Value" Value="{Binding DelayMiliseconds}"/>
+                                            <Setter Property="Text" Value="{Binding DelayMiliseconds, Mode=TwoWay, Converter={StaticResource StringLongConverter}}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </cex:UpDownLongTextBoxEx.Style>
-                        </cex:UpDownLongTextBoxEx>
+                            </cex:TextBoxEx.Style>
+                        </cex:TextBoxEx>
+
+                        <cex:ButtonEx
+                            IconKind="Minus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValueMonusButtonExClick"/>
 
                         <TextBlock
                             Margin="8,0,0,0"
@@ -325,42 +344,66 @@
                             </Style>
                         </StackPanel.Style>
 
-                        <cex:UpDownDoubleTextBoxEx>
-                            <cex:UpDownDoubleTextBoxEx.Style>
-                                <Style BasedOn="{StaticResource MacroItemUpDownDoubleTextBoxExStyle}" TargetType="{x:Type cex:UpDownDoubleTextBoxEx}">
+                        <cex:ButtonEx
+                            x:Name="_plusXButtonEx"
+                            IconKind="Plus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValuePlusButtonExClick"/>
+
+                        <cex:TextBoxEx
+                            PreviewKeyDown="DoubleNumericTextBoxExPreviewKeyDown"
+                            PreviewTextInput="DoubleNumericTextBoxExPreviewTextInput">
+                            <cex:TextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemNumericTextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
                                     <Setter Property="IsEnabled" Value="False"/>
-                                    <Setter Property="Value" Value="0"/>
 
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseMove}">
                                             <Setter Property="IsEnabled" Value="True"/>
-                                            <Setter Property="Value" Value="{Binding X}"/>
+                                            <Setter Property="Text" Value="{Binding X, Mode=TwoWay, Converter={StaticResource StringDoubleConverter}}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </cex:UpDownDoubleTextBoxEx.Style>
-                        </cex:UpDownDoubleTextBoxEx>
+                            </cex:TextBoxEx.Style>
+                        </cex:TextBoxEx>
+
+                        <cex:ButtonEx
+                            x:Name="_minusXButtonEx"
+                            IconKind="Minus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValueMonusButtonExClick"/>
 
                         <TextBlock
                             Margin="8,0"
                             Text="x"
                             VerticalAlignment="Center"/>
 
-                        <cex:UpDownDoubleTextBoxEx>
-                            <cex:UpDownDoubleTextBoxEx.Style>
-                                <Style BasedOn="{StaticResource MacroItemUpDownDoubleTextBoxExStyle}" TargetType="{x:Type cex:UpDownDoubleTextBoxEx}">
+                        <cex:ButtonEx
+                            x:Name="_plusYButtonEx"
+                            IconKind="Plus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValuePlusButtonExClick"/>
+
+                        <cex:TextBoxEx>
+                            <cex:TextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemNumericTextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
                                     <Setter Property="IsEnabled" Value="False"/>
-                                    <Setter Property="Value" Value="0"/>
 
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseMove}">
                                             <Setter Property="IsEnabled" Value="True"/>
-                                            <Setter Property="Value" Value="{Binding Y}"/>
+                                            <Setter Property="Text" Value="{Binding Y, Mode=TwoWay, Converter={StaticResource StringDoubleConverter}}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </cex:UpDownDoubleTextBoxEx.Style>
-                        </cex:UpDownDoubleTextBoxEx>
+                            </cex:TextBoxEx.Style>
+                        </cex:TextBoxEx>
+
+                        <cex:ButtonEx
+                            x:Name="_minusYButtonEx"
+                            IconKind="Minus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValueMonusButtonExClick"/>
 
                     </StackPanel>
 
@@ -384,25 +427,36 @@
                             </Style>
                         </StackPanel.Style>
 
-                        <cex:UpDownLongTextBoxEx>
-                            <cex:UpDownLongTextBoxEx.Style>
-                                <Style BasedOn="{StaticResource MacroItemUpDownLongTextBoxExStyle}" TargetType="{x:Type cex:UpDownLongTextBoxEx}">
+                        <cex:ButtonEx
+                            IconKind="Plus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValuePlusButtonExClick"/>
+
+                        <cex:TextBoxEx
+                            PreviewKeyDown="LongNumericTextBoxExPreviewKeyDown"
+                            PreviewTextInput="LongNumericTextBoxExPreviewTextInput">
+                            <cex:TextBoxEx.Style>
+                                <Style BasedOn="{StaticResource MacroItemNumericTextBoxExStyle}" TargetType="{x:Type cex:TextBoxEx}">
                                     <Setter Property="IsEnabled" Value="False"/>
-                                    <Setter Property="Value" Value="0"/>
 
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseScrollHorizontal}">
                                             <Setter Property="IsEnabled" Value="True"/>
-                                            <Setter Property="Value" Value="{Binding ScrollShift}"/>
+                                            <Setter Property="Text" Value="{Binding ScrollShift, Mode=TwoWay, Converter={StaticResource StringLongConverter}}"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding MacroType}" Value="{x:Static macros:MacroType.MouseScrollVertical}">
                                             <Setter Property="IsEnabled" Value="True"/>
-                                            <Setter Property="Value" Value="{Binding ScrollShift}"/>
+                                            <Setter Property="Text" Value="{Binding ScrollShift, Mode=TwoWay, Converter={StaticResource StringLongConverter}}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </cex:UpDownLongTextBoxEx.Style>
-                        </cex:UpDownLongTextBoxEx>
+                            </cex:TextBoxEx.Style>
+                        </cex:TextBoxEx>
+
+                        <cex:ButtonEx
+                            IconKind="Minus"
+                            Style="{StaticResource MacroItemToolButtonExStyle}"
+                            Click="ValueMonusButtonExClick"/>
 
                     </StackPanel>
 
@@ -422,6 +476,7 @@
 
                         <cex:ButtonEx
                             Content="Capture Keys"
+                            Focusable="False"
                             IconKind="Keyboard"
                             Margin="0,0,8,0"
                             Click="CaptureKeyMacroItemButtonExClick">
@@ -450,6 +505,7 @@
                         </cex:ButtonEx>
 
                         <cex:ButtonEx
+                            Focusable="False"
                             IconKind="BinOutline"
                             Click="RemoveMacroItemButtonExClick"/>
 
