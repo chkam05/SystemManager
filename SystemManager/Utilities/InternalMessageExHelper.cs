@@ -2,6 +2,7 @@
 using chkam05.Tools.ControlsEx.InternalMessages;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace SystemManager.Utilities
     {
 
         //  METHODS
+
+        #region APPEARANCE METHODS
 
         //  --------------------------------------------------------------------------------
         /// <summary> Set internal message appearance. </summary>
@@ -64,6 +67,35 @@ namespace SystemManager.Utilities
             internalMessageEx.HeaderBackground = appearanceConfig.ThemeBackgroundBrush;
             internalMessageEx.HeaderBorderBrush = appearanceConfig.AccentColorBrush;
         }
+
+        #endregion APPEARANCE METHODS
+
+        #region FILES METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Set initial directory in FilesSelectorInternalMessageEx. </summary>
+        /// <param name="internalMessageEx"> Files selector internal message Ex. </param>
+        public static void SetInitialDirectory(FilesSelectorInternalMessageEx internalMessageEx)
+        {
+            var lastUsedDirectory = ConfigManager.Instance.Config.LastUsedDirectory;
+
+            if (!string.IsNullOrEmpty(lastUsedDirectory) && Directory.Exists(lastUsedDirectory))
+                internalMessageEx.InitialDirectory = lastUsedDirectory;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Override initial directory in config. </summary>
+        /// <param name="fileDirectoryPath"> Selected file directory path. </param>
+        public static void OverrideInitialDirectory(string? fileDirectoryPath)
+        {
+            if (!string.IsNullOrEmpty(fileDirectoryPath) && Directory.Exists(fileDirectoryPath))
+            {
+                ConfigManager.Instance.Config.LastUsedDirectory = fileDirectoryPath;
+                ConfigManager.Instance.SaveConfig();
+            }
+        }
+
+        #endregion FILES METHODS
 
     }
 }

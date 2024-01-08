@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using SystemManager.Controls;
+using SystemManager.Data.Configuration;
 using SystemManager.Pages;
 using SystemManager.Utilities;
 using SystemManager.ViewModels.MainMenu;
@@ -204,6 +205,14 @@ namespace SystemManager.Windows
         /// <param name="e"> Routed Event Arguments. </param>
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+            //  Configure
+            var config = ConfigManager.Instance.Config;
+
+            Left = config.WindowPositionX;
+            Top = config.WindowPositionY;
+            Width = config.WindowWidth;
+            Height = config.WindowHeight;
+
             //  Load Macros Page
             OpenMacrosPageMainMenuItemSelect();
 
@@ -215,6 +224,22 @@ namespace SystemManager.Windows
             InternalMessageExHelper.SetInternalMessageAppearance(imWelcome);
 
             IMContainer.ShowMessage(imWelcome);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked before window close. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Cancel Event Arguments. </param>
+        private void WindowExClosing(object sender, CancelEventArgs e)
+        {
+            var config = ConfigManager.Instance.Config;
+
+            config.WindowPositionX = Convert.ToInt32(Left);
+            config.WindowPositionY = Convert.ToInt32(Top);
+            config.WindowWidth = Convert.ToInt32(Width);
+            config.WindowHeight = Convert.ToInt32(Height);
+
+            ConfigManager.Instance.SaveConfig();
         }
 
         #endregion WINDOW METHODS

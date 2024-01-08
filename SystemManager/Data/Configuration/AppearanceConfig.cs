@@ -24,6 +24,7 @@ namespace SystemManager.Data.Configuration
         private static readonly int SELECTED_FACTOR = 5;
 
         public static readonly Color ACCENT_COLOR = Color.FromArgb(255, 0, 120, 215);
+        public static readonly ThemeType THEME_TYPE = ThemeType.Dark;
         public static readonly Color DARK_THEME_COLOR = Color.FromArgb(255, 36, 36, 36);
         public static readonly Color LIGHT_THEME_COLOR = Color.FromArgb(255, 219, 219, 219);
 
@@ -32,6 +33,9 @@ namespace SystemManager.Data.Configuration
 
         private static AppearanceConfig? _instance;
         private static object _instanceLock = new object();
+
+        private Color _accentColor = ACCENT_COLOR;
+        private ThemeType _themeType = THEME_TYPE;
 
         private Brush _accentColorBrush;
         private Brush _accentForegroundBrush;
@@ -59,6 +63,26 @@ namespace SystemManager.Data.Configuration
 
                     return _instance;
                 }
+            }
+        }
+
+        public Color AccentColor
+        {
+            get => _accentColor;
+            set
+            {
+                UpdateProperty(ref _accentColor, value);
+                Setup();
+            }
+        }
+
+        public ThemeType ThemeType
+        {
+            get => _themeType;
+            set
+            {
+                UpdateProperty(ref _themeType, value);
+                Setup();
             }
         }
 
@@ -181,9 +205,8 @@ namespace SystemManager.Data.Configuration
         /// <summary> Setup. </summary>
         private void Setup()
         {
-            var accentColor = ACCENT_COLOR;
-            var accentAhslColor = AHSLColor.FromColor(accentColor);
-            var accentForegroundColor = GetForegroundContrastedColor(accentColor);
+            var accentAhslColor = AHSLColor.FromColor(AccentColor);
+            var accentForegroundColor = GetForegroundContrastedColor(AccentColor);
 
             var accentMouseOverColor = UpdateAHSLColor(accentAhslColor,
                 lightness: accentAhslColor.L + MOUSE_OVER_FACTOR).ToColor();
@@ -194,15 +217,23 @@ namespace SystemManager.Data.Configuration
             var accentSelectedColor = UpdateAHSLColor(accentAhslColor,
                 lightness: accentAhslColor.L - SELECTED_FACTOR).ToColor();
 
-            AccentColorBrush = new SolidColorBrush(accentColor);
+            AccentColorBrush = new SolidColorBrush(AccentColor);
             AccentForegroundBrush = new SolidColorBrush(accentForegroundColor);
             AccentMouseOverBrush = new SolidColorBrush(accentMouseOverColor);
             AccentPressedBrush = new SolidColorBrush(accentPressedColor);
             AccentSelectedBrush = new SolidColorBrush(accentSelectedColor);
 
-            var backgroundColor = Colors.Black;
-            var foregroundColor = Colors.White;
-            var shadeBackgroundColor = AppearanceConfig.DARK_THEME_COLOR;
+            var backgroundColor = ThemeType == ThemeType.Dark
+                ? Colors.Black
+                : Colors.White;
+
+            var foregroundColor = ThemeType == ThemeType.Dark
+                ? Colors.White
+                : Colors.Black;
+
+            var shadeBackgroundColor = ThemeType == ThemeType.Dark
+                ? AppearanceConfig.DARK_THEME_COLOR
+                : AppearanceConfig.LIGHT_THEME_COLOR;
 
             var backgroundAhslColor = AHSLColor.FromColor(backgroundColor);
 

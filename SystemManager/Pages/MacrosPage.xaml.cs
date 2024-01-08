@@ -14,7 +14,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using SystemManager.Data.Macros;
 using SystemController.MouseKeyboard.Data;
 using MouseButton = SystemController.MouseKeyboard.Data.MouseButton;
@@ -29,6 +28,8 @@ using SystemManager.Data.Macros.Events;
 using SystemManager.Controls;
 using System.Reflection;
 using System.Globalization;
+using System.IO;
+using SystemManager.Data.Configuration;
 
 namespace SystemManager.Pages
 {
@@ -110,6 +111,10 @@ namespace SystemManager.Pages
                     try
                     {
                         _macroRunner.OpenMacroItems(e.FilePath);
+
+                        var fileDirectoryPath = Path.GetDirectoryName(e.FilePath);
+
+                        InternalMessageExHelper.OverrideInitialDirectory(fileDirectoryPath);
                     }
                     catch (Exception exc)
                     {
@@ -172,6 +177,10 @@ namespace SystemManager.Pages
                     try
                     {
                         _macroRunner.SaveMacroItems(e.FilePath, false);
+
+                        var fileDirectoryPath = Path.GetDirectoryName(e.FilePath);
+
+                        InternalMessageExHelper.OverrideInitialDirectory(fileDirectoryPath);
                     }
                     catch (Exception exc)
                     {
@@ -401,6 +410,7 @@ namespace SystemManager.Pages
             internalMessage.OnClose += closeHandler;
 
             InternalMessageExHelper.SetFilesSelectorInternalMessageAppearance(internalMessage);
+            InternalMessageExHelper.SetInitialDirectory(internalMessage);
 
             return internalMessage;
         }
@@ -439,6 +449,7 @@ namespace SystemManager.Pages
             internalMessage.OnClose += closeHandler;
 
             InternalMessageExHelper.SetFilesSelectorInternalMessageAppearance(internalMessage);
+            InternalMessageExHelper.SetInitialDirectory(internalMessage);
 
             return internalMessage;
         }

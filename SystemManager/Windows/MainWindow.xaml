@@ -18,13 +18,16 @@
     Foreground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     Height="450"
     IconKind="Tools"
+    MinHeight="450"
+    MinWidth="650"
     MouseOverTitleBarButtonBackground="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     MouseOverTitleBarButtonForeground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     PressedTitleBarButtonBackground="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     PressedTitleBarButtonForeground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     Title="MainWindow"
     Width="800"
-    Loaded="WindowLoaded">
+    Loaded="WindowLoaded"
+    Closing="WindowExClosing">
 
     <Grid>
 
