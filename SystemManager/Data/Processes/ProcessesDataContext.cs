@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -9,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using SystemController.ProcessesManagement;
 using SystemController.ProcessesManagement.Data;
+using SystemManager.Data.Configuration;
+using SystemManager.Data.Processes.Data;
 using SystemManager.Data.Processes.Events;
 using SystemManager.ViewModels.Base;
 using SystemManager.ViewModels.Processes;
@@ -21,17 +24,23 @@ namespace SystemManager.Data.Processes
         //  DELEGATES
 
         public delegate void ProcessesLoaderFinishedEventHandler(object? sender, ProcessesLoaderFinishedEventArgs e);
+        public delegate void WindowsLoaderFinishedEventHandler(object? sender, WindowsLoaderFinishedEventArgs e);
 
 
         //  EVENTS
 
         public ProcessesLoaderFinishedEventHandler? ProcessesLoaded;
+        public WindowsLoaderFinishedEventHandler? WindowsLoaded;
 
 
         //  VARIABLES
 
-        private BackgroundWorker? _loaderBackgroundWorker;
-        private ObservableCollection<ProcessInfoViewModel> _processes;
+        private BackgroundWorker? _processesLoaderBackgroundWorker;
+        private BackgroundWorker? _windowsLoaderBackgroundWorker;
+        private ObservableCollection<ProcessInfoViewModel>? _processes;
+        private ObservableCollection<ProcessInfoViewModel>? _processesFiltered;
+
+        private string _filterText;
 
         public ProcessManager ProcessManager;
 
@@ -40,7 +49,16 @@ namespace SystemManager.Data.Processes
 
         public ObservableCollection<ProcessInfoViewModel> Processes
         {
-            get => _processes;
+            get
+            {
+                if (_processes == null)
+                {
+                    _processes = new ObservableCollection<ProcessInfoViewModel>();
+                    _processes.CollectionChanged += OnProcessesCollectionChanged;
+                }
+
+                return _processes;
+            }
             set
             {
                 _processes = value;
@@ -50,9 +68,55 @@ namespace SystemManager.Data.Processes
             }
         }
 
+        public ObservableCollection<ProcessInfoViewModel> ProcessesFiltered
+        {
+            get
+            {
+                if (_processesFiltered == null)
+                {
+                    _processesFiltered = new ObservableCollection<ProcessInfoViewModel>();
+                    _processesFiltered.CollectionChanged += OnProcessesFilteredCollectionChanged;
+                }
+
+                return _processesFiltered;
+            }
+            set
+            {
+                _processesFiltered = value;
+                _processesFiltered.CollectionChanged += OnProcessesFilteredCollectionChanged;
+                OnPropertyChanged(nameof(ProcessesFiltered));
+            }
+        }
+
         public int ProcessesCount
         {
             get => _processes.Count;
+        }
+
+        public string FilterText
+        {
+            get => _filterText;
+            set
+            {
+                UpdateProperty(ref _filterText, value);
+                OnPropertyChanged(nameof(IsFilterMode));
+                ApplySearchFilter();
+            }
+        }
+
+        public bool IsFilterMode
+        {
+            get => !string.IsNullOrEmpty(_filterText) && !string.IsNullOrWhiteSpace(_filterText);
+        }
+
+        public bool IsProcessesLoading
+        {
+            get => _processesLoaderBackgroundWorker != null && _processesLoaderBackgroundWorker.IsBusy;
+        }
+
+        public bool IsWindowsLoading
+        {
+            get => _windowsLoaderBackgroundWorker != null && _windowsLoaderBackgroundWorker.IsBusy;
         }
 
 
@@ -64,7 +128,10 @@ namespace SystemManager.Data.Processes
         /// <summary> ProcessesDataContext class constructor. </summary>
         public ProcessesDataContext()
         {
-            _processes = new ObservableCollection<ProcessInfoViewModel>();
+            _filterText = string.Empty;
+
+            Processes = new ObservableCollection<ProcessInfoViewModel>();
+            ProcessesFiltered = new ObservableCollection<ProcessInfoViewModel>();
 
             ProcessManager = new ProcessManager();
         }
@@ -73,40 +140,119 @@ namespace SystemManager.Data.Processes
         /// <summary> Performs tasks associated with freeing, releasing, or resetting unmanaged resources. </summary>
         public void Dispose()
         {
-            if (_loaderBackgroundWorker != null && _loaderBackgroundWorker.IsBusy)
-                _loaderBackgroundWorker.CancelAsync();
+            if (_processesLoaderBackgroundWorker != null && _processesLoaderBackgroundWorker.IsBusy)
+                _processesLoaderBackgroundWorker.CancelAsync();
         }
 
         #endregion CLASS METHODS
 
+        #region FILTERING METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Apply search filter. </summary>
+        private void ApplySearchFilter()
+        {
+            if (!IsFilterMode)
+            {
+                ProcessesFiltered.Clear();
+                return;
+            }
+
+            ProcessesFiltered.Clear();
+            ProcessesFiltered = new ObservableCollection<ProcessInfoViewModel>(Processes.Where(
+                p => FilterProcessInfoViewModel(p, _filterText)));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Apply search filter on single ProcessInfo view model. </summary>
+        /// <param name="processInfoViewModel"> Process info view model. </param>
+        /// <param name="searchText"> Query text. </param>
+        /// <returns> True - process info item match query; False - otherwise. </returns>
+        private bool FilterProcessInfoViewModel(ProcessInfoViewModel processInfoViewModel, string searchText)
+        {
+            var processInfoOption = ConfigManager.Instance.Config.ProcessInfoOptions;
+            bool queryResult = false;
+
+            if (processInfoOption.Name && processInfoViewModel.Name != null)
+                queryResult = processInfoViewModel.Name.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            if (processInfoOption.Description && processInfoViewModel.Description != null)
+                queryResult = processInfoViewModel.Description.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            if (processInfoOption.CommandLocation && processInfoViewModel.CommandLocation != null)
+                queryResult = processInfoViewModel.CommandLocation.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            if (processInfoOption.UserName && processInfoViewModel.UserName != null)
+                queryResult = processInfoViewModel.UserName.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            return queryResult;
+        }
+
+        #endregion FILTERING METHODS
+
         #region PROCESSES MANAGEMENT METHODS
 
         //  --------------------------------------------------------------------------------
-        /// <summary> Load processes. </summary>
-        public void LoadProcesses()
+        /// <summary> Add ProcessInfoViewModel to processes collection. </summary>
+        /// <param name="processInfoViewModel"> Process info view model. </param>
+        private void AddProcessInfoViewModel(ProcessInfoViewModel processInfoViewModel)
         {
-            if (_loaderBackgroundWorker != null && _loaderBackgroundWorker.IsBusy)
+            if (processInfoViewModel == null)
                 return;
 
-            _loaderBackgroundWorker = new BackgroundWorker();
-            _loaderBackgroundWorker.WorkerReportsProgress = true;
-            _loaderBackgroundWorker.WorkerSupportsCancellation = true;
+            Processes.Add(processInfoViewModel);
 
-            _loaderBackgroundWorker.DoWork += LoadProcessesWork;
-            _loaderBackgroundWorker.ProgressChanged += LoadProcessesWorkProgressChanged;
-            _loaderBackgroundWorker.RunWorkerCompleted += LoadProcessesWorkCompleted;
+            if (IsFilterMode && FilterProcessInfoViewModel(processInfoViewModel, _filterText))
+                ProcessesFiltered.Add(processInfoViewModel);
+        }
 
+        //  --------------------------------------------------------------------------------
+        /// <summary> Clear processes collections. </summary>
+        private void ClearProcesses()
+        {
             Processes.Clear();
+            ProcessesFiltered.Clear();
+        }
 
-            _loaderBackgroundWorker.RunWorkerAsync();
+        //  --------------------------------------------------------------------------------
+        /// <summary> Load processes. </summary>
+        /// <returns> True - loading started; False - otherwise. </returns>
+        public bool LoadProcesses()
+        {
+            if (_processesLoaderBackgroundWorker != null && _processesLoaderBackgroundWorker.IsBusy)
+                return false;
+
+            _processesLoaderBackgroundWorker = new BackgroundWorker();
+            _processesLoaderBackgroundWorker.WorkerReportsProgress = true;
+            _processesLoaderBackgroundWorker.WorkerSupportsCancellation = true;
+
+            _processesLoaderBackgroundWorker.DoWork += LoadProcessesWork;
+            _processesLoaderBackgroundWorker.ProgressChanged += LoadProcessesWorkProgressChanged;
+            _processesLoaderBackgroundWorker.RunWorkerCompleted += LoadProcessesWorkCompleted;
+
+            ClearProcesses();
+
+            _processesLoaderBackgroundWorker.RunWorkerAsync();
+
+            OnPropertyChanged(nameof(IsProcessesLoading));
+
+            return IsProcessesLoading;
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Stop loading processes. </summary>
         public void StopLoadingProcesses()
         {
-            if (_loaderBackgroundWorker != null && _loaderBackgroundWorker.IsBusy)
-                _loaderBackgroundWorker.CancelAsync();
+            if (_processesLoaderBackgroundWorker != null && _processesLoaderBackgroundWorker.IsBusy)
+                _processesLoaderBackgroundWorker.CancelAsync();
         }
 
         //  --------------------------------------------------------------------------------
@@ -119,12 +265,16 @@ namespace SystemManager.Data.Processes
 
             Exception? exception = null;
             List<ProcessInfo> processesInfo = new List<ProcessInfo>();
+            int processesInfoCount = 0;
             int processIndex = 0;
             int progress = 0;
+
+            //  Get processes.
 
             try
             {
                 processesInfo = ProcessManager.GetProcesses(out List<Exception> exceptions);
+                processesInfoCount = processesInfo.Count;
             }
             catch (Exception exc)
             {
@@ -136,8 +286,7 @@ namespace SystemManager.Data.Processes
                 return;
             }
 
-            var processesInfoCount = processesInfo.Count;
-
+            //  Consider stopping loading.
 
             if (e.Cancel || (worker?.CancellationPending ?? false))
             {
@@ -148,6 +297,8 @@ namespace SystemManager.Data.Processes
                 };
                 return;
             }
+
+            //  Load each process.
 
             foreach (var processInfo in processesInfo)
             {
@@ -172,8 +323,8 @@ namespace SystemManager.Data.Processes
         /// <param name="e"> Progress Changed Event Arguments. </param>
         private void LoadProcessesWorkProgressChanged(object? sender, ProgressChangedEventArgs e)
         {
-            if (e.UserState is ProcessInfoViewModel processInfoViewModel && processInfoViewModel != null)
-                Processes.Add(processInfoViewModel);
+            if (e.UserState is ProcessInfoViewModel processInfoViewModel)
+                AddProcessInfoViewModel(processInfoViewModel);
         }
 
         //  --------------------------------------------------------------------------------
@@ -190,12 +341,12 @@ namespace SystemManager.Data.Processes
                 if (exception != null)
                 {
                     ProcessesLoaded?.Invoke(this, new ProcessesLoaderFinishedEventArgs(exception, processIndex ?? -1));
-                    Processes.Clear();
+                    ClearProcesses();
                 }
                 else if (e.Cancelled)
                 {
                     ProcessesLoaded?.Invoke(this, new ProcessesLoaderFinishedEventArgs(stopped: true));
-                    Processes.Clear();
+                    ClearProcesses();
                 }
                 else
                 {
@@ -203,8 +354,8 @@ namespace SystemManager.Data.Processes
                 }
             }
 
-            OnPropertyChanged(nameof(Processes));
             OnPropertyChanged(nameof(ProcessesCount));
+            OnPropertyChanged(nameof(IsProcessesLoading));
         }
 
         #endregion PROCESSES MANAGEMENT METHODS
@@ -221,7 +372,155 @@ namespace SystemManager.Data.Processes
             OnPropertyChanged(nameof(ProcessesCount));
         }
 
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after ProcessesFiltered collection change. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Notify Collection Changed Event Arguments. </param>
+        private void OnProcessesFilteredCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(ProcessesFiltered));
+        }
+
         #endregion PROPERITES CHANGED METHODS
+
+        #region WINDOWS MANAGEMENT METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Load windows. </summary>
+        /// <param name="processInfo"> Process info. </param>
+        /// <returns> True - loading started; False - otherwise. </returns>
+        public bool LoadWindows(ProcessInfo processInfo)
+        {
+            if (processInfo == null)
+                return false;
+
+            if (!ProcessManager.IsProcessAlive(processInfo, out _) || !processInfo.HasWindows)
+                return false;
+
+            if (_windowsLoaderBackgroundWorker != null && _windowsLoaderBackgroundWorker.IsBusy)
+                return false;
+
+            _windowsLoaderBackgroundWorker = new BackgroundWorker();
+            _windowsLoaderBackgroundWorker.WorkerSupportsCancellation = true;
+
+            _windowsLoaderBackgroundWorker.DoWork += LoadWindowsWork;
+            _windowsLoaderBackgroundWorker.RunWorkerCompleted += LoadWindowsWorkCompleted;
+
+            _windowsLoaderBackgroundWorker.RunWorkerAsync(processInfo);
+
+            OnPropertyChanged(nameof(IsWindowsLoading));
+
+            return IsWindowsLoading;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Stop loading windows. </summary>
+        public void StopLoadingWindows()
+        {
+            if (_windowsLoaderBackgroundWorker != null && _windowsLoaderBackgroundWorker.IsBusy)
+                _windowsLoaderBackgroundWorker.CancelAsync();
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Load windows background worker work method. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Do Work Event Arguments. </param>
+        public void LoadWindowsWork(object? sender, DoWorkEventArgs e)
+        {
+            var worker = sender as BackgroundWorker;
+
+            Exception? exception = null;
+            ProcessInfo? processInfo = e.Argument as ProcessInfo;
+            List<WindowInfo>? windows;
+
+            if (processInfo == null)
+            {
+                e.Result = new object?[]
+                {
+                    exception,
+                    new List<WindowInfoViewModel>()
+                };
+                return;
+            }
+
+            //  Get windows.
+
+            try
+            {
+                windows = ProcessManager.GetWindows(processInfo);
+            }
+            catch (Exception exc)
+            {
+                e.Result = new object?[]
+                {
+                    exc,
+                    new List<WindowInfoViewModel>()
+                };
+                return;
+            }
+
+            //  Consider stopping loading.
+
+            if (e.Cancel || (worker?.CancellationPending ?? false))
+            {
+                e.Result = new object?[]
+                {
+                    exception,
+                    new List<WindowInfoViewModel>()
+                };
+                return;
+            }
+
+            //  If no windows.
+
+            if (!(windows?.Any() ?? false))
+            {
+                e.Result = new object?[]
+                {
+                    exception,
+                    new List<WindowInfoViewModel>()
+                };
+                return;
+            }
+
+            //  Load each window.
+
+            e.Result = new object?[]
+            {
+                exception,
+                windows.Select(w => new WindowInfoViewModel(w)).ToList()
+            };
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Load windows background worker work completed method. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Run Worker Completed Event Arguments. </param>
+        public void LoadWindowsWorkCompleted(object? sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Result is object?[] result)
+            {
+                Exception? exception = result[0] as Exception;
+                List<WindowInfoViewModel>? windowInfoViewModels = result[1] as List<WindowInfoViewModel>;
+
+                if (exception != null)
+                {
+                    WindowsLoaded?.Invoke(this, new WindowsLoaderFinishedEventArgs(exception, windowInfoViewModels));
+                }
+                else if (e.Cancelled)
+                {
+                    WindowsLoaded?.Invoke(this, new WindowsLoaderFinishedEventArgs(stopped: true));
+                }
+                else
+                {
+                    WindowsLoaded?.Invoke(this, new WindowsLoaderFinishedEventArgs(windows: windowInfoViewModels));
+                }
+            }
+
+            OnPropertyChanged(nameof(IsWindowsLoading));
+        }
+
+        #endregion WINDOWS MANAGEMENT METHODS
 
     }
 }

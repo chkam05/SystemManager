@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using SystemManager.Data.Processes.Data;
 using SystemManager.ViewModels.Base;
 
 namespace SystemManager.Data.Configuration
@@ -16,6 +17,7 @@ namespace SystemManager.Data.Configuration
 
         private Color _appearanceColor;
         private string _lastUsedDirectory;
+        private ProcessInfoOption _processInfoOptions;
         private ThemeType _themeType;
         private int _windowPositionX;
         private int _windowPositionY;
@@ -42,6 +44,12 @@ namespace SystemManager.Data.Configuration
             {
                 UpdateProperty(ref _lastUsedDirectory, value);
             }
+        }
+
+        public ProcessInfoOption ProcessInfoOptions
+        {
+            get => _processInfoOptions;
+            set => UpdateProperty(ref _processInfoOptions, value);
         }
 
         public ThemeType ThemeType
@@ -89,6 +97,7 @@ namespace SystemManager.Data.Configuration
         public Config(
             Color? appearanceColor = null,
             string? lastUsedDirectory = null,
+            ProcessInfoOption? processInfoOptions = null,
             ThemeType? themeType = null,
             int? windowPositionX = null,
             int? windowPositionY = null,
@@ -97,6 +106,7 @@ namespace SystemManager.Data.Configuration
         {
             AppearanceColor = appearanceColor ?? AppearanceConfig.ACCENT_COLOR;
             LastUsedDirectory = lastUsedDirectory ?? string.Empty;
+            ProcessInfoOptions = processInfoOptions ?? new ProcessInfoOption();
             ThemeType = themeType ?? AppearanceConfig.THEME_TYPE;
             WindowPositionX = windowPositionX.HasValue ? windowPositionX.Value : 300;
             WindowPositionY = windowPositionY.HasValue ? windowPositionY.Value : 300;

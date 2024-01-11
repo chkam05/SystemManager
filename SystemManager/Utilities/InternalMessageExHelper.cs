@@ -26,6 +26,19 @@ namespace SystemManager.Utilities
         }
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Set await internal message appearance. </summary>
+        /// <param name="internalMessageEx"> AwaitInternalMessageEx. </param>
+        public static void SetAwaitInternalMessageAppearance(AwaitInternalMessageEx internalMessageEx)
+        {
+            var appearanceConfig = AppearanceConfig.Instance;
+
+            internalMessageEx.IndicatorFill = appearanceConfig.AccentColorBrush;
+            internalMessageEx.IndicatorPen = appearanceConfig.AccentColorBrush;
+
+            SetBaseInternalMessageAppearance(internalMessageEx);
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Set files selector internal message appearance. </summary>
         /// <param name="internalMessageEx"> FilesSelectorInternalMessageEx. </param>
         public static void SetFilesSelectorInternalMessageAppearance(FilesSelectorInternalMessageEx internalMessageEx)

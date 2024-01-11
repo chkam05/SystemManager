@@ -5,6 +5,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
     xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:conv="clr-namespace:SystemManager.Converters"
+    xmlns:convProc="clr-namespace:SystemManager.Data.Processes.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SystemManager.Pages"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -26,23 +28,50 @@
             <!-- STATIC -->
 
             <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+            <x:Static x:Key="ConfigManager" Member="cfg:ConfigManager.Instance"/>
+            <RelativeSource x:Key="PageSource" Mode="FindAncestor" AncestorType="{x:Type local:ProcessesPage}"/>
+            
+            
+            <!-- CONVERTERS -->
+
+            <conv:BoolVisibilityConverter x:Key="BoolVisibilityConverter"/>
+            <convProc:AutoRefreshIconKindConverter x:Key="AutoRefreshIconKindConverter"/>
+            <convProc:ProcessLoadStateIconKindConverter x:Key="ProcessLoadStateIconKindConverter"/>
 
 
             <!-- STYLES -->
 
+            <Style x:Key="ProcessInfoBorderStyle" TargetType="{x:Type Border}">
+                <Setter Property="Background" Value="{x:Null}"/>
+                <Setter Property="BorderBrush" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Margin" Value="0,0,-1,-1"/>
+                <Setter Property="Padding" Value="0,4"/>
+            </Style>
+
+            <Style x:Key="ProcessInfoBorderSeparatorStyle" TargetType="{x:Type Border}">
+                <Setter Property="Background" Value="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="BorderBrush" Value="{x:Null}" />
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Height" Value="1"/>
+                <Setter Property="Margin" Value="0,4"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            </Style>
+
             <Style x:Key="ProcessInfoHeaderTextBlockStyle" TargetType="{x:Type TextBlock}">
                 <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Margin" Value="8,0"/>
                 <Setter Property="MinWidth" Value="128"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
 
             <Style x:Key="ProcessInfoValueTextBlockStyle" TargetType="{x:Type TextBlock}">
-                <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Margin" Value="8,0"/>
             </Style>
 
             <Style x:Key="ProcessItemButtonExStyle" BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
-                <Setter Property="Margin" Value="0,0,0,8"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
                 <Setter Property="MinWidth" Value="128"/>
             </Style>
 
@@ -69,189 +98,361 @@
             <DataTemplate x:Key="ProcessItemViewModelDataTemplate">
                 <Grid>
                     
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <WrapPanel
+                        Grid.Row="0"
+                        HorizontalAlignment="Stretch"
+                        Orientation="Horizontal">
+
+                        <!-- PID -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.Id,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager}, 
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="PID:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding Id}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Name -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.Name,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Name:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding Name}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Description -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.Description,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Description:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding Description}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Type -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.Type,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Type:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding Type}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- CPU Usage -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.CPUUsage,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="CPU Usage:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding CPUUsage}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Memory Usage -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.MemoryUsage,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Memory Usage:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding MemoryUsage}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Is System Service -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.IsSystemService,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="System Service:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding IsSystemService}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Mode -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.Mode,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Mode:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding Mode}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Priority -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.Priority,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Priority:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding Priority}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Thread Count -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.ThreadCount,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Threads:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding ThreadCount}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Uptime -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.Uptime,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Uptime:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding Uptime}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- Owner -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.UserName,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Owner:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding UserName}"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                        <!-- CommandLine/Location -->
+                        <Border
+                            Style="{StaticResource ProcessInfoBorderStyle}"
+                            Visibility="{
+                                Binding Config.ProcessInfoOptions.CommandLocation,
+                                Mode=OneWay,
+                                Source={StaticResource ConfigManager},
+                                Converter={StaticResource BoolVisibilityConverter}}">
+
+                            <StackPanel
+                                Orientation="Vertical">
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
+                                    Text="Command/Location:"/>
+
+                                <Border Style="{StaticResource ProcessInfoBorderSeparatorStyle}"/>
+
+                                <TextBlock
+                                    Style="{StaticResource ProcessInfoValueTextBlockStyle}"
+                                    Text="{Binding CommandLocation}"
+                                    TextWrapping="Wrap"/>
+
+                            </StackPanel>
+
+                        </Border>
+
+                    </WrapPanel>
 
                     <StackPanel
-                        Grid.Column="0"
-                        Orientation="Vertical">
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="PID:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding Id}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Name:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding Name}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Description:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding Description}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Type:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding Type}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Command/Location:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding CommandLocation}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="CPU Usage:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding CPUUsage}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Memory Usage:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding MemoryUsage}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Is system service:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding IsSystemService}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Mode:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding Mode}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Priority:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding Priority}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Threads:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding ThreadCount}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Uptime:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding Uptime}"/>
-
-                        </StackPanel>
-
-                        <StackPanel
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoHeaderTextBlockStyle}"
-                                Text="Owner:"/>
-
-                            <TextBlock
-                                Style="{StaticResource ProcessInfoValueTextBlockStyle}"
-                                Text="{Binding UserName}"/>
-
-                        </StackPanel>
-
-                    </StackPanel>
-
-                    <StackPanel
-                        Grid.Column="1"
-                        Orientation="Vertical">
+                        Grid.Row="1"
+                        Margin="0,8,0,0"
+                        Orientation="Horizontal">
 
                         <cex:ButtonEx
                             Content="Close"
@@ -315,6 +516,7 @@
                 <Grid>
 
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
@@ -326,16 +528,111 @@
                         <cex:ButtonEx
                             Content="Auto Refresh"
                             IconKind="CheckBoxOutlineBlank"
-                            Click="AutoRefreshButtonExClick"/>
+                            Click="AutoRefreshButtonExClick"
+                            Visibility="Collapsed"/>
 
                     </StackPanel>
 
                     <StackPanel
                         Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+
+                        <materialDesign:PackIcon
+                            Height="24"
+                            Kind="Search"
+                            Width="24"
+                            VerticalAlignment="Center"/>
+
+                        <cex:TextBoxEx
+                            FontSize="14"
+                            Margin="8,0,0,0"
+                            MinWidth="256"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            TextLiveModified="SearchTextBoxExTextLiveModified"/>
+
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="2"
                         Orientation="Horizontal">
 
                         <cex:ButtonEx
-                            IconKind="Refresh"
+                            Content="Options"
+                            IconKind="FormatListBulleted"
+                            Click="OptionsButtonExClick">
+                            
+                            <cex:ButtonEx.ContextMenu>
+                                <cex:ContextMenuEx>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show ID"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.Id, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Name"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.Name, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Description"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.Description, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Type"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.Type, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Command Location"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.CommandLocation, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Memory Usage"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.MemoryUsage, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Is System Service"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.IsSystemService, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Mode"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.Mode, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Priority"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.Priority, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Thread Count"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.ThreadCount, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show Uptime"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.Uptime, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                    <cex:ContextMenuItemEx
+                                        Header="Show UserName"
+                                        IsCheckable="True"
+                                        IsChecked="{Binding Config.ProcessInfoOptions.UserName, Source={StaticResource ConfigManager}, Mode=TwoWay}"/>
+
+                                </cex:ContextMenuEx>
+                            </cex:ButtonEx.ContextMenu>
+                            
+                        </cex:ButtonEx>
+
+                        <cex:ButtonEx
+                            IconKind="{Binding IsProcessesLoading, Mode=OneWay, Converter={StaticResource ProcessLoadStateIconKindConverter}, ConverterParameter={x:Static convProc:ProcessLoadStateIconKindConverterParam.RefreshButton}}"
                             Click="RefreshButtonExClick"/>
 
                     </StackPanel>
@@ -347,10 +644,22 @@
             <cex:ListViewEx
                 x:Name="_processesListView"
                 Grid.Row="1"
-                ItemsSource="{Binding Processes}"
                 ItemTemplate="{StaticResource ProcessItemViewModelDataTemplate}"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                SelectionChanged="ProcessesListViewSelectionChanged"/>
+                SelectionChanged="ProcessesListViewSelectionChanged">
+                
+                <cex:ListViewEx.Style>
+                    <Style BasedOn="{StaticResource ListViewExStyle}" TargetType="{x:Type cex:ListViewEx}">
+                        <Setter Property="ItemsSource" Value="{Binding Processes}"/>
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsFilterMode}" Value="True">
+                                <Setter Property="ItemsSource" Value="{Binding ProcessesFiltered}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </cex:ListViewEx.Style>
+            </cex:ListViewEx>
 
             <Border
                 Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
@@ -363,13 +672,25 @@
                     Orientation="Horizontal">
 
                     <materialDesign:PackIcon
-                        Kind="Memory"
+                        Kind="{Binding IsProcessesLoading, Mode=OneWay, Converter={StaticResource ProcessLoadStateIconKindConverter}, ConverterParameter={x:Static convProc:ProcessLoadStateIconKindConverterParam.StatusBarIcon}}"
                         Style="{StaticResource StatusBarPackIconStyle}"/>
 
-                    <TextBlock
-                        Margin="8,0,0,0"
-                        Style="{StaticResource StatusBarValueTextBlockStyle}"
-                        Text="{Binding ProcessesCount}"/>
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style BasedOn="{StaticResource StatusBarTextBlockStyle}" TargetType="{x:Type TextBlock}">
+                                <Setter Property="Text" Value="{Binding ProcessesCount}"/>
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsProcessesLoading}" Value="True">
+                                        <Setter Property="Text" Value="Loading ..."/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsProcessesLoading}" Value="False">
+                                        <Setter Property="Text" Value="{Binding ProcessesCount}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                 </StackPanel>
 

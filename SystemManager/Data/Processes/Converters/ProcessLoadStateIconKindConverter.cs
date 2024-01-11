@@ -17,12 +17,25 @@ namespace SystemManager.Data.Processes.Converters
         //  --------------------------------------------------------------------------------
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            var param = parameter as ProcessLoadStateIconKindConverterParam?;
             var state = value as bool?;
 
             if (state.HasValue)
-                return state.Value ? PackIconKind.Stop : PackIconKind.Refresh;
+            {
+                if (param.HasValue)
+                {
+                    switch (param)
+                    {
+                        case ProcessLoadStateIconKindConverterParam.RefreshButton:
+                            return state.Value ? PackIconKind.Stop : PackIconKind.Refresh;
 
-            return PackIconKind.Play;
+                        case ProcessLoadStateIconKindConverterParam.StatusBarIcon:
+                            return state.Value ? PackIconKind.Refresh : PackIconKind.Memory;
+                    }
+                }
+            }
+
+            return PackIconKind.Refresh;
         }
 
         //  --------------------------------------------------------------------------------

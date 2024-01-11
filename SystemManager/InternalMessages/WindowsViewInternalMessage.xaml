@@ -1,0 +1,343 @@
+﻿<cexIM:StandardInternalMessageEx
+    xmlns:cexIM="clr-namespace:chkam05.Tools.ControlsEx.InternalMessages;assembly=chkam05.Tools.ControlsEx"
+    x:Class="SystemManager.InternalMessages.WindowsViewInternalMessage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SystemManager.InternalMessages"
+    mc:Ignorable="d"
+    
+    d:DesignWidth="800"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    BorderBrush="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    BottomBackground="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    BottomBorderBrush="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    BottomPadding="8"
+    ButtonBackground="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonBorderBrush="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonForeground="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonMouseOverBackground="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonMouseOverBorderBrush="{Binding AccentMouseOverBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonMouseOverForeground="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonPressedBackground="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonPressedBorderBrush="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    ButtonPressedForeground="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    Foreground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    HeaderBackground="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    HeaderBorderBrush="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    HeaderPadding="8"
+    IconKind="Application"
+    MinHeight="256"
+    MinWidth="512"
+    Padding="0"
+    Title="Windows"
+    UseCustomSectionBreaksBorderBrush="True">
+
+    <cexIM:StandardInternalMessageEx.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- STATIC -->
+
+            <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+            
+            
+            <!-- STYLES -->
+
+            <Style x:Key="WindowItemListViewItemExStyle" BasedOn="{StaticResource ListViewItemExStyle}" TargetType="{x:Type cex:ListViewItemEx}">
+                <Setter Property="MouseOverBackground" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="MouseOverBorderBrush" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="MouseOverForeground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="SelectedBackground" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="SelectedBorderBrush" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="SelectedForeground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="SelectedInactiveBackground" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="SelectedInactiveBorderBrush" Value="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+                <Setter Property="SelectedInactiveForeground" Value="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"/>
+            </Style>
+
+            <Style x:Key="WindowInfoToolButtonExStyle" BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                <Setter Property="ContentSide" Value="Bottom"/>
+                <Setter Property="MinWidth" Value="72"/>
+            </Style>
+            
+            <Style x:Key="WindowInfoHeaderTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="MinWidth" Value="128"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="WindowInfoValueTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="WindowInfoHeaderVertTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Margin" Value="0,8,0,0"/>
+                <Setter Property="MinWidth" Value="128"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="WindowInfoValueVertTextBlockStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="0,4,0,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+
+            <!-- DATA TEMPLATES -->
+
+            <DataTemplate x:Key="WindowInfoDataTemplate">
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        Orientation="Vertical">
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoHeaderTextBlockStyle}"
+                                Text="Title:"/>
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoValueTextBlockStyle}"
+                                Text="{Binding Title}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoHeaderTextBlockStyle}"
+                                Text="Class Name:"/>
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoValueTextBlockStyle}"
+                                Text="{Binding ClassName}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoHeaderTextBlockStyle}"
+                                Text="Attributes:"/>
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoValueTextBlockStyle}"
+                                Text="{Binding Attributes}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoHeaderTextBlockStyle}"
+                                Text="Role:"/>
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoValueTextBlockStyle}"
+                                Text="{Binding Role}"/>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Orientation="Horizontal">
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoHeaderTextBlockStyle}"
+                                Text="Transparency:"/>
+
+                            <TextBlock
+                                Style="{StaticResource WindowInfoValueTextBlockStyle}"
+                                Text="{Binding Transparency}"/>
+
+                        </StackPanel>
+
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Grid.Row="0"
+                        Orientation="Vertical">
+
+                        <!-- State -->
+                        
+                        <TextBlock
+                            Margin="0"
+                            Style="{StaticResource WindowInfoHeaderVertTextBlockStyle}"
+                            Text="State:"/>
+
+                        <TextBlock
+                            Style="{StaticResource WindowInfoValueVertTextBlockStyle}"
+                            Text="{Binding State}"/>
+
+                        <!-- Visibility -->
+                        
+                        <TextBlock
+                            Style="{StaticResource WindowInfoHeaderVertTextBlockStyle}"
+                            Text="Visible:"/>
+
+                        <TextBlock
+                            Style="{StaticResource WindowInfoValueVertTextBlockStyle}"
+                            Text="{Binding Visible}"/>
+
+                        <!-- Position -->
+
+                        <TextBlock
+                            Style="{StaticResource WindowInfoHeaderVertTextBlockStyle}"
+                            Text="Position:"/>
+
+                        <TextBlock
+                            Style="{StaticResource WindowInfoValueVertTextBlockStyle}">
+                            <Run Text="{Binding PositionX}"/>
+                            <Run Text=" x "/>
+                            <Run Text="{Binding PositionY}"/>
+                        </TextBlock>
+
+                        <!-- Size -->
+
+                        <TextBlock
+                            Style="{StaticResource WindowInfoHeaderVertTextBlockStyle}"
+                            Text="Size:"/>
+
+                        <TextBlock
+                            Margin="0,4,0,0"
+                            Style="{StaticResource WindowInfoValueVertTextBlockStyle}">
+                            <Run Text="{Binding Width}"/>
+                            <Run Text=" x "/>
+                            <Run Text="{Binding Height}"/>
+                        </TextBlock>
+
+                        <!-- Buttons -->
+
+                        <cex:ButtonEx
+                            Content="Child windows"
+                            IconKind="PictureInPictureBottomRight"
+                            Margin="0,8,0,0"
+                            Click="ChildWindowsButtonExClick">
+                            <cex:ButtonEx.Style>
+                                <Style BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasChildWindows}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:ButtonEx.Style>
+                        </cex:ButtonEx>
+
+                        <cex:ButtonEx
+                            Content="Parent window"
+                            IconKind="Application"
+                            Margin="0,8,0,0"
+                            Click="ParentWindowButtonExClick">
+                            <cex:ButtonEx.Style>
+                                <Style BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasParentWindow}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:ButtonEx.Style>
+                        </cex:ButtonEx>
+
+                    </StackPanel>
+
+                    <Border
+                        Grid.ColumnSpan="2"
+                        Grid.Row="1"
+                        Background="{Binding AccentForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                        BorderBrush="{x:Null}"
+                        BorderThickness="0"
+                        Height="1"
+                        Margin="0,8"
+                        VerticalAlignment="Stretch"/>
+
+                    <StackPanel
+                        Grid.ColumnSpan="2"
+                        Grid.Row="2"
+                        Orientation="Horizontal">
+
+                        <cex:ButtonEx
+                            Content="Close"
+                            IconKind="WindowClose"
+                            Style="{StaticResource WindowInfoToolButtonExStyle}"
+                            Click="CloseWindowButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Maximize"
+                            IconKind="WindowMaximize"
+                            Style="{StaticResource WindowInfoToolButtonExStyle}"
+                            Click="MaximizeWindowButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Maximize"
+                            IconKind="WindowMinimize"
+                            Style="{StaticResource WindowInfoToolButtonExStyle}"
+                            Click="MinimizeWindowButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Restore"
+                            IconKind="WindowRestore"
+                            Style="{StaticResource WindowInfoToolButtonExStyle}"
+                            Click="RestoreWindowButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Set active"
+                            IconKind="ArrangeBringForward"
+                            Style="{StaticResource WindowInfoToolButtonExStyle}"
+                            Click="BringToFrontWindowButtonExClick"/>
+
+                    </StackPanel>
+
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </cexIM:StandardInternalMessageEx.Resources>
+
+    <Grid>
+
+        <cex:ListViewEx
+            x:Name="_processesListView"
+            Grid.Row="1"
+            ItemContainerStyle="{StaticResource WindowItemListViewItemExStyle}"
+            ItemTemplate="{StaticResource WindowInfoDataTemplate}"
+            ItemsSource="{Binding Windows}"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            SelectionChanged="WindowsListViewSelectionChanged">
+        </cex:ListViewEx>
+
+    </Grid>
+    
+</cexIM:StandardInternalMessageEx>

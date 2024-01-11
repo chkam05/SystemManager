@@ -18,7 +18,8 @@ namespace SystemManager.ViewModels.Processes
 
         private ObservableCollection<WindowInfoViewModel> _childWindows;
         private WindowInfoViewModel? _parentWindow;
-        private WindowInfo _windowInfo;
+
+        public WindowInfo WindowInfo { get; private set; }
 
 
         //  GETTERS & SETTERS
@@ -31,6 +32,7 @@ namespace SystemManager.ViewModels.Processes
                 _childWindows = value;
                 _childWindows.CollectionChanged += OnChildWindowsCollectionChanged;
                 OnPropertyChanged(nameof(ChildWindows));
+                OnPropertyChanged(nameof(HasChildWindows));
             }
         }
 
@@ -41,95 +43,152 @@ namespace SystemManager.ViewModels.Processes
             {
                 _parentWindow = value;
                 OnPropertyChanged(nameof(ParentWindow));
+                OnPropertyChanged(nameof(HasParentWindow));
             }
+        }
+
+        public bool HasChildWindows
+        {
+            get => _childWindows?.Any() ?? false;
+        }
+
+        public bool HasParentWindow
+        {
+            get => _parentWindow != null;
         }
 
         public string? ClassName
         {
-            get => _windowInfo.ClassName;
+            get => WindowInfo.ClassName;
             set
             {
-                _windowInfo.ClassName = value;
+                WindowInfo.ClassName = value;
                 OnPropertyChanged(nameof(ClassName));
             }
         }
 
         public WindowAttributes Attributes
         {
-            get => _windowInfo.Attributes;
+            get => WindowInfo.Attributes;
             set
             {
-                _windowInfo.Attributes = value;
+                WindowInfo.Attributes = value;
                 OnPropertyChanged(nameof(Attributes));
             }
         }
 
-        public POINT Position
+        public int PositionX
         {
-            get => _windowInfo.Position;
+            get => WindowInfo.Position.X;
             set
             {
-                _windowInfo.Position = value;
-                OnPropertyChanged(nameof(Position));
+                WindowInfo.Position = new POINT()
+                {
+                    X = value,
+                    Y = WindowInfo.Position.Y
+                };
+                OnPropertyChanged(nameof(PositionX));
+            }
+        }
+
+        public int PositionY
+        {
+            get => WindowInfo.Position.Y;
+            set
+            {
+                WindowInfo.Position = new POINT()
+                {
+                    X = WindowInfo.Position.X,
+                    Y = value
+                };
+                OnPropertyChanged(nameof(PositionY));
+            }
+        }
+
+        public int Height
+        {
+            get => WindowInfo.Size.Height;
+            set
+            {
+                WindowInfo.Size = new SIZE()
+                {
+                    Height = value,
+                    Width = WindowInfo.Size.Width,
+                };
+                OnPropertyChanged(nameof(Height));
+            }
+        }
+
+        public int Width
+        {
+            get => WindowInfo.Size.Width;
+            set
+            {
+                WindowInfo.Size = new SIZE()
+                {
+                    Height = WindowInfo.Size.Width,
+                    Width = value
+                };
+                OnPropertyChanged(nameof(Width));
             }
         }
 
         public WindowRole Role
         {
-            get => _windowInfo.Role;
+            get => WindowInfo.Role;
             set
             {
-                _windowInfo.Role = value;
+                WindowInfo.Role = value;
                 OnPropertyChanged(nameof(Role));
             }
         }
 
         public SIZE Size
         {
-            get => _windowInfo.Size;
+            get => WindowInfo.Size;
             set
             {
-                _windowInfo.Size = value;
+                WindowInfo.Size = value;
                 OnPropertyChanged(nameof(Size));
             }
         }
 
         public WindowState State
         {
-            get => _windowInfo.State;
+            get => WindowInfo.State;
             set
             {
-                _windowInfo.State = value;
+                WindowInfo.State = value;
                 OnPropertyChanged(nameof(State));
             }
         }
 
         public string? Title
         {
-            get => _windowInfo.Title;
+            get => WindowInfo.Title;
             set
             {
-                _windowInfo.Title = value;
+                WindowInfo.Title = value;
                 OnPropertyChanged(nameof(Title));
             }
         }
 
         public int Transparency
         {
-            get => _windowInfo.Transparency;
+            get => WindowInfo.Transparency;
             set
             {
-                _windowInfo.Transparency = value;
+                WindowInfo.Transparency = value;
                 OnPropertyChanged(nameof(Transparency));
             }
         }
 
         public bool Visible
         {
-            get => _windowInfo.Visible;
+            get => WindowInfo.Visible;
             set
             {
-                _windowInfo.Visible = value;
+                WindowInfo.Visible = value;
                 OnPropertyChanged(nameof(Visible));
             }
         }
@@ -145,7 +204,7 @@ namespace SystemManager.ViewModels.Processes
         public WindowInfoViewModel(WindowInfo windowInfo)
         {
             _childWindows = new ObservableCollection<WindowInfoViewModel>();
-            _windowInfo = windowInfo;
+            WindowInfo = windowInfo;
 
             if (windowInfo.ChildWindows?.Any() ?? false)
                 ChildWindows = new ObservableCollection<WindowInfoViewModel>(
@@ -155,9 +214,17 @@ namespace SystemManager.ViewModels.Processes
                 ? new WindowInfoViewModel(windowInfo.ParentWindow)
                 : null;
 
+            OnPropertyChanged(nameof(ChildWindows));
+            OnPropertyChanged(nameof(HasChildWindows));
+            OnPropertyChanged(nameof(ParentWindow));
+            OnPropertyChanged(nameof(HasParentWindow));
+
             OnPropertyChanged(nameof(ClassName));
             OnPropertyChanged(nameof(Attributes));
-            OnPropertyChanged(nameof(Position));
+            OnPropertyChanged(nameof(PositionX));
+            OnPropertyChanged(nameof(PositionY));
+            OnPropertyChanged(nameof(Width));
+            OnPropertyChanged(nameof(Height));
             OnPropertyChanged(nameof(Role));
             OnPropertyChanged(nameof(Size));
             OnPropertyChanged(nameof(State));

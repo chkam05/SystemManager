@@ -14,147 +14,147 @@ namespace SystemManager.ViewModels.Processes
 
         //  VARIABLES
 
-        private ProcessInfo _processInfo;
+        public ProcessInfo ProcessInfo { get; private set; }
 
 
         //  GETTERS & SETTERS
         
         public int Id
         {
-            get => _processInfo.Id;
+            get => ProcessInfo.Id;
             set
             {
-                _processInfo.Id = value;
+                ProcessInfo.Id = value;
                 OnPropertyChanged(nameof(Id));
             }
         }
 
         public string? Name
         {
-            get => _processInfo.Name;
+            get => ProcessInfo.Name;
             set
             {
-                _processInfo.Name = value;
+                ProcessInfo.Name = value;
                 OnPropertyChanged(nameof(Name));
             }
         }
 
         public string? Description
         {
-            get => _processInfo.Description;
+            get => ProcessInfo.Description;
             set
             {
-                _processInfo.Description = value;
+                ProcessInfo.Description = value;
                 OnPropertyChanged(nameof(Description));
             }
         }
 
         public string? Type
         {
-            get => _processInfo.Type;
+            get => ProcessInfo.Type;
             set
             {
-                _processInfo.Type = value;
+                ProcessInfo.Type = value;
                 OnPropertyChanged(nameof(Type));
             }
         }
 
         public string? CommandLocation
         {
-            get => _processInfo.CommandLocation;
+            get => ProcessInfo.CommandLocation;
             set
             {
-                _processInfo.CommandLocation = value;
+                ProcessInfo.CommandLocation = value;
                 OnPropertyChanged(nameof(CommandLocation));
             }
         }
 
-        public double CPUUsage
+        public double? CPUUsage
         {
-            get => _processInfo.CPUUsage;
+            get => ProcessInfo.CPUUsage;
             set
             {
-                _processInfo.CPUUsage = value;
+                ProcessInfo.CPUUsage = value;
                 OnPropertyChanged(nameof(CPUUsage));
             }
         }
 
-        public long MemoryUsage
+        public long? MemoryUsage
         {
-            get => _processInfo.MemoryUsage;
+            get => ProcessInfo.MemoryUsage;
             set
             {
-                _processInfo.MemoryUsage = value;
+                ProcessInfo.MemoryUsage = value;
                 OnPropertyChanged(nameof(MemoryUsage));
             }
         }
 
         public bool HasWindows
         {
-            get => _processInfo.HasWindows;
+            get => ProcessInfo.HasWindows;
             set
             {
-                _processInfo.HasWindows = value;
+                ProcessInfo.HasWindows = value;
                 OnPropertyChanged(nameof(HasWindows));
             }
         }
 
         public bool IsSystemService
         {
-            get => _processInfo.IsSystemService;
+            get => ProcessInfo.IsSystemService;
             set
             {
-                _processInfo.IsSystemService = value;
+                ProcessInfo.IsSystemService = value;
                 OnPropertyChanged(nameof(IsSystemService));
             }
         }
 
         public ProcessMode Mode
         {
-            get => _processInfo.Mode;
+            get => ProcessInfo.Mode;
             set
             {
-                _processInfo.Mode = value;
+                ProcessInfo.Mode = value;
                 OnPropertyChanged(nameof(Mode));
             }
         }
 
         public ProcessPriorityClass? Priority
         {
-            get => _processInfo.Priority;
+            get => ProcessInfo.Priority;
             set
             {
-                _processInfo.Priority = value;
+                ProcessInfo.Priority = value;
                 OnPropertyChanged(nameof(Priority));
             }
         }
 
         public int ThreadCount
         {
-            get => _processInfo.ThreadCount;
+            get => ProcessInfo.ThreadCount;
             set
             {
-                _processInfo.ThreadCount = value;
+                ProcessInfo.ThreadCount = value;
                 OnPropertyChanged(nameof(ThreadCount));
             }
         }
 
-        public TimeSpan Uptime
+        public TimeSpan? Uptime
         {
-            get => _processInfo.Uptime;
+            get => ProcessInfo.Uptime;
             set
             {
-                _processInfo.Uptime = value;
+                ProcessInfo.Uptime = value;
                 OnPropertyChanged(nameof(Uptime));
             }
         }
 
         public string? UserName
         {
-            get => _processInfo.UserName;
+            get => ProcessInfo.UserName;
             set
             {
-                _processInfo.UserName = value;
+                ProcessInfo.UserName = value;
                 OnPropertyChanged(nameof(UserName));
             }
         }
@@ -169,7 +169,7 @@ namespace SystemManager.ViewModels.Processes
         /// <param name="processInfo"> Process information. </param>
         public ProcessInfoViewModel(ProcessInfo processInfo)
         {
-            _processInfo = processInfo;
+            ProcessInfo = processInfo;
 
             OnPropertyChanged(nameof(Id));
             OnPropertyChanged(nameof(Name));

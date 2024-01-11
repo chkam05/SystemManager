@@ -18,20 +18,22 @@ namespace SystemController.ProcessesManagement
 
         //  CONST
 
+        private const int GWL_EXSTYLE = -20;
+        private const int GW_OWNER = 4;
+        private const int GWL_STYLE = -16;
+        private const uint GW_CHILD = 5;
+        private const uint GW_HWNDNEXT = 2;
         private const int SW_SHOWMINIMIZED = 2;
         private const int SW_SHOWMAXIMIZED = 3;
-        private const uint GW_HWNDNEXT = 2;
-        private const int GW_OWNER = 4;
-        private const uint GW_CHILD = 5;
-        private const int GWL_EXSTYLE = -20;
-        private const int GWL_STYLE = -16;
-        private const int WS_EX_LAYERED = 0x80000;
-        private const int WS_EX_DISABLED = 0x8000000;
-        private const int WS_SYSMENU = 0x80000;
-        private const int WS_DLGFRAME = 0x00400000;
-        private const int WS_TOOLWINDOW = 0x00000080;
         private const int SW_RESTORE = 9;
         private const uint SWP_SHOWWINDOW = 0x40;
+        private const int WS_EX_DISABLED = 0x8000000;
+        private const int WS_EX_LAYERED = 0x80000;
+        private const int WS_DLGFRAME = 0x00400000;
+        private const int WS_TOOLWINDOW = 0x00000080;
+        private const int WS_SYSMENU = 0x80000;
+
+        private const int NameSamCompatible = 2;
 
 
         //  DELEGATES
@@ -39,7 +41,7 @@ namespace SystemController.ProcessesManagement
         private delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
 
 
-        //  IMPORTS
+        #region IMPORTS
 
         //  advapi32
 
@@ -82,6 +84,12 @@ namespace SystemController.ProcessesManagement
         [DllImport("psapi.dll", SetLastError = true)]
         private static extern bool GetProcessMemoryInfo(IntPtr hProcess, out PROCESS_MEMORY_COUNTERS_EX counters, uint size);
 
+        //  secur32
+
+        [DllImport("secur32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetUserNameEx(int nameFormat, StringBuilder userName, ref uint userNameSize);
+
         //  user32
 
         [DllImport("user32.dll")]
@@ -113,9 +121,16 @@ namespace SystemController.ProcessesManagement
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
+        [DllImport("user32.dll")]
+        private static extern int GetWindowThreadProcessId(IntPtr hWnd, out uint lpwdProcessId);
+
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool IsIconic(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWindow(IntPtr hWnd);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -147,6 +162,8 @@ namespace SystemController.ProcessesManagement
 
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
+        #endregion IMPORTS
 
 
         //  METHODS
@@ -191,7 +208,7 @@ namespace SystemController.ProcessesManagement
         /// <summary> Get process CPU usage. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> CPU usage. </returns>
-        private double GetProcessCPUUsage(Process process)
+        private double? GetProcessCPUUsage(Process process)
         {
             try
             {
@@ -203,17 +220,17 @@ namespace SystemController.ProcessesManagement
             }
             catch (Win32Exception)
             {
-                return 0.0;
+                return null;
             }
 
-            return 0.0;
+            return null;
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Get process memory usage. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> Process memory usage. </returns>
-        private long GetProcessMemoryUsage(Process process)
+        private long? GetProcessMemoryUsage(Process process)
         {
             PROCESS_MEMORY_COUNTERS_EX counters = new PROCESS_MEMORY_COUNTERS_EX();
 
@@ -224,10 +241,10 @@ namespace SystemController.ProcessesManagement
             }
             catch (Win32Exception)
             {
-                return 0;
+                return null;
             }
 
-            return 0;
+            return null;
         }
 
         //  --------------------------------------------------------------------------------
@@ -236,22 +253,21 @@ namespace SystemController.ProcessesManagement
         /// <returns> Process mode. </returns>
         private ProcessMode GetProcessMode(Process process)
         {
-            try
+            if (Environment.Is64BitOperatingSystem)
             {
-                if (Environment.Is64BitOperatingSystem)
+                try
                 {
                     bool isWow64;
 
                     if (IsWow64Process(process.Handle, out isWow64) && isWow64)
                         return ProcessMode.Bit32;
-
-                    else
-                        return ProcessMode.Bit64;
                 }
-            }
-            catch (Win32Exception)
-            {
-                return ProcessMode.Bit32;
+                catch (Win32Exception)
+                {
+                    //
+                }
+
+                return ProcessMode.Bit64;
             }
 
             return ProcessMode.Bit32;
@@ -284,7 +300,7 @@ namespace SystemController.ProcessesManagement
         /// <summary> Get process uptime. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> Process uptime. </returns>
-        private TimeSpan GetProcessUptime(Process process)
+        private TimeSpan? GetProcessUptime(Process process)
         {
             FILETIME creationTime, exitTime, kernelTime, userTime;
 
@@ -298,59 +314,54 @@ namespace SystemController.ProcessesManagement
             }
             catch (Win32Exception)
             {
-                return TimeSpan.Zero;
+                return null;
             }
 
-            return TimeSpan.Zero;
+            return null;
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Get process username. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> Process username. </returns>
-        private string GetProcessUserName(Process process)
+        private string? GetProcessUserName(Process process)
         {
             IntPtr processHandle = IntPtr.Zero;
 
             try
             {
-                processHandle = OpenProcess(ProcessAccessFlags.QueryInformation, false, process.Id);
+                processHandle = OpenProcess(ProcessAccessFlags.QueryLimitedInformation, false, process.Id);
 
                 if (processHandle != IntPtr.Zero)
                 {
-                    int size = 0;
-                    GetTokenInformation(processHandle, TokenInformationClass.TokenUser, IntPtr.Zero, 0, out size);
+                    uint length = 200;
 
-                    IntPtr tokenInformation = Marshal.AllocHGlobal(size);
-                    try
+                    StringBuilder sb = new StringBuilder((int)length);
+
+                    if (GetUserNameEx(NameSamCompatible, sb, ref length))
                     {
-                        if (GetTokenInformation(processHandle, TokenInformationClass.TokenUser, tokenInformation, size, out size))
-                        {
-                            TOKEN_USER tokenUser = (TOKEN_USER)Marshal.PtrToStructure(tokenInformation, typeof(TOKEN_USER));
-
-                            IntPtr userSid = tokenUser.User.Sid;
-                            IntPtr userNamePtr;
-
-                            if (ConvertSidToStringSid(userSid, out userNamePtr))
-                            {
-                                string userName = Marshal.PtrToStringAuto(userNamePtr);
-                                return userName;
-                            }
-                        }
+                        return sb.ToString();
                     }
-                    finally
+                    else
                     {
-                        Marshal.FreeHGlobal(tokenInformation);
+                        throw new Win32Exception(Marshal.GetLastWin32Error());
                     }
                 }
+                else
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+
+            }
+            catch (Exception)
+            {
+                return null;
             }
             finally
             {
                 if (processHandle != IntPtr.Zero)
                     CloseHandle(processHandle);
             }
-
-            return "Unknown User";
         }
 
         //  --------------------------------------------------------------------------------
@@ -429,7 +440,7 @@ namespace SystemController.ProcessesManagement
         {
             bool anyWindow = false;
 
-            foreach (ProcessThread thread in process.Threads)
+            /*foreach (ProcessThread thread in process.Threads)
             {
                 EnumThreadWindows(thread.Id, (hWnd, lParam) =>
                 {
@@ -437,7 +448,7 @@ namespace SystemController.ProcessesManagement
                     return true;
                 },
                 IntPtr.Zero);
-            }
+            }*/
 
             return anyWindow;
         }
@@ -465,14 +476,14 @@ namespace SystemController.ProcessesManagement
         /// <summary> Is process system process. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> True - is system process; False - otherwise. </returns>
-        private bool IsSystemProcess(Process process, string processUserName)
+        private bool IsSystemProcess(Process process, string? processUserName)
         {
             try
             {
                 bool hasSystemCharacteristics = process.PriorityClass == ProcessPriorityClass.High
                     && process.Id <= 4;
 
-                bool isSystemAccount = processUserName.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase);
+                bool isSystemAccount = processUserName?.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase) ?? false;
 
                 return hasSystemCharacteristics || isSystemAccount;
             }
@@ -547,20 +558,48 @@ namespace SystemController.ProcessesManagement
         }
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Check if process is alive. </summary>
+        /// <param name="processInfo"> Process information. </param>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - process is alive; False - otherwise. </returns>
+        public bool IsProcessAlive(ProcessInfo processInfo, out Process? process)
+        {
+            try
+            {
+                process = Process.GetProcessById(processInfo.Id);
+                return true;
+            }
+            catch (Exception)
+            {
+                process = null;
+                return false;
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Kill process. </summary>
         /// <param name="processInfo"> Process information. </param>
         /// <param name="force"> Force kill process. </param>
-        public void KillProcess(ProcessInfo processInfo, bool force = false)
+        public ProcessActionResult KillProcess(ProcessInfo processInfo, bool force = false)
         {
-            Process process = Process.GetProcessById(processInfo.Id);
-
-            if (force)
-                process.Kill();
-
-            else
+            try
             {
-                process.CloseMainWindow();
-                process.WaitForExit();
+                if (!IsProcessAlive(processInfo, out Process? process))
+                    return ProcessActionResult.ProcessNotExist;
+
+                if (force)
+                {
+                    process?.Kill();
+                    return ProcessActionResult.Success;
+                }
+
+                process?.CloseMainWindow();
+                process?.WaitForExit();
+                return ProcessActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return ProcessActionResult.UnknownError;
             }
         }
 
@@ -732,19 +771,26 @@ namespace SystemController.ProcessesManagement
         /// <returns> List of windows. </returns>
         public List<WindowInfo> GetWindows(ProcessInfo processInfo)
         {
-            Process process = Process.GetProcessById(processInfo.Id);
+            try
+            {
+                Process process = Process.GetProcessById(processInfo.Id);
 
-            if (process != null)
-                return GetWindows(process);
+                if (process != null)
+                    return GetWindows(process);
 
-            return new List<WindowInfo>();
+                return new List<WindowInfo>();
+            }
+            catch (Exception)
+            {
+                return new List<WindowInfo>();
+            }
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Get process windows. </summary>
         /// <param name="process"> Process. </param>
         /// <returns> List of windows. </returns>
-        public List<WindowInfo> GetWindows(Process process)
+        private List<WindowInfo> GetWindows(Process process)
         {
             List<WindowInfo> windows = new List<WindowInfo>();
             IntPtr mainWindowHandle = process.MainWindowHandle;
@@ -752,7 +798,7 @@ namespace SystemController.ProcessesManagement
             if (mainWindowHandle != IntPtr.Zero)
                 windows.Add(GetWindowInfo(mainWindowHandle));
 
-            foreach (ProcessThread thread in process.Threads)
+            /*foreach (ProcessThread thread in process.Threads)
             {
                 EnumThreadWindows(thread.Id, (hWnd, lParam) =>
                 {
@@ -760,7 +806,7 @@ namespace SystemController.ProcessesManagement
                     return true;
                 },
                 IntPtr.Zero);
-            }
+            }*/
 
             foreach (WindowInfo window in windows)
             {
@@ -785,58 +831,213 @@ namespace SystemController.ProcessesManagement
         }
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Check if window is alive. </summary>
+        /// <param name="windowInfo"> Window informations. </param>
+        /// <param name="windowHandle"> Window handle. </param>
+        /// <param name="process"> Process. </param>
+        /// <returns> True - window is alive; False - otherwise. </returns>
+        public bool IsWindowAlive(WindowInfo windowInfo, out IntPtr windowHandle, out Process? process)
+        {
+            process = null;
+            windowHandle = IntPtr.Zero;
+
+            if (windowInfo.Handle == IntPtr.Zero)
+                return false;
+
+            if (!IsWindow(windowInfo.Handle))
+                return false;
+
+            uint processId;
+            GetWindowThreadProcessId(windowInfo.Handle, out processId);
+
+            try
+            {
+                process = Process.GetProcessById((int)processId);
+                windowHandle = windowInfo.Handle;
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Close window. </summary>
         /// <param name="windowInfo"> Window information. </param>
-        public void CloseWindow(WindowInfo windowInfo)
+        public WindowActionResult CloseWindow(WindowInfo windowInfo)
         {
-            CloseWindow(windowInfo.Handle);
+            try
+            {
+                if (!IsWindowAlive(windowInfo, out IntPtr windowHandle, out Process? process))
+                {
+                    if (process == null)
+                        return WindowActionResult.ProcessNotExist;
+                    else
+                        return WindowActionResult.WindowNotExist;
+                }
+
+                CloseWindow(windowHandle);
+                return WindowActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return WindowActionResult.UnknownError;
+            }
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Focus window. </summary>
         /// <param name="windowInfo"> Window information. </param>
-        public void FocusWindow(WindowInfo windowInfo)
+        public WindowActionResult FocusWindow(WindowInfo windowInfo)
         {
-            if (windowInfo.State == WindowState.Minimized)
-                ShowWindowAsync(windowInfo.Handle, SW_RESTORE);
+            try
+            {
+                if (!IsWindowAlive(windowInfo, out IntPtr windowHandle, out Process? process))
+                {
+                    if (process == null)
+                        return WindowActionResult.ProcessNotExist;
+                    else
+                        return WindowActionResult.WindowNotExist;
+                }
 
-            SetForegroundWindow(windowInfo.Handle);
+                if (windowInfo.State == WindowState.Minimized)
+                    ShowWindow(windowInfo.Handle, SW_RESTORE);
+
+                SetForegroundWindow(windowInfo.Handle);
+                return WindowActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return WindowActionResult.UnknownError;
+            }
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Maximize window. </summary>
         /// <param name="windowInfo"> Window information. </param>
-        public void MaximizeWindow(WindowInfo windowInfo)
+        public WindowActionResult MaximizeWindow(WindowInfo windowInfo)
         {
-            ShowWindow(windowInfo.Handle, SW_SHOWMAXIMIZED);
+            try
+            {
+                if (!IsWindowAlive(windowInfo, out IntPtr windowHandle, out Process? process))
+                {
+                    if (process == null)
+                        return WindowActionResult.ProcessNotExist;
+                    else
+                        return WindowActionResult.WindowNotExist;
+                }
+
+                ShowWindow(windowInfo.Handle, SW_SHOWMAXIMIZED);
+                return WindowActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return WindowActionResult.UnknownError;
+            }
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Minimize window. </summary>
         /// <param name="windowInfo"> Window information. </param>
-        public void MinimizeWindow(WindowInfo windowInfo)
+        public WindowActionResult MinimizeWindow(WindowInfo windowInfo)
         {
-            ShowWindow(windowInfo.Handle, SW_SHOWMINIMIZED);
+            try
+            {
+                if (!IsWindowAlive(windowInfo, out IntPtr windowHandle, out Process? process))
+                {
+                    if (process == null)
+                        return WindowActionResult.ProcessNotExist;
+                    else
+                        return WindowActionResult.WindowNotExist;
+                }
+
+                ShowWindow(windowInfo.Handle, SW_SHOWMINIMIZED);
+                return WindowActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return WindowActionResult.UnknownError;
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Restore window. </summary>
+        /// <param name="windowInfo"> Window information. </param>
+        public WindowActionResult RestoreWindow(WindowInfo windowInfo)
+        {
+            try
+            {
+                if (!IsWindowAlive(windowInfo, out IntPtr windowHandle, out Process? process))
+                {
+                    if (process == null)
+                        return WindowActionResult.ProcessNotExist;
+                    else
+                        return WindowActionResult.WindowNotExist;
+                }
+
+                ShowWindow(windowInfo.Handle, SW_RESTORE);
+                return WindowActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return WindowActionResult.UnknownError;
+            }
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Resize window. </summary>
         /// <param name="windowInfo"> Window information. </param>
         /// <param name="newSize"> New window size. </param>
-        public void ResizeWindow(WindowInfo windowInfo, SIZE newSize)
+        public WindowActionResult ResizeWindow(WindowInfo windowInfo, SIZE newSize)
         {
-            SetWindowPos(windowInfo.Handle, IntPtr.Zero, windowInfo.Position.X, windowInfo.Position.Y,
-                newSize.Width, newSize.Height, SWP_SHOWWINDOW);
+            try
+            {
+                if (!IsWindowAlive(windowInfo, out IntPtr windowHandle, out Process? process))
+                {
+                    if (process == null)
+                        return WindowActionResult.ProcessNotExist;
+                    else
+                        return WindowActionResult.WindowNotExist;
+                }
+
+                SetWindowPos(windowInfo.Handle, IntPtr.Zero, windowInfo.Position.X, windowInfo.Position.Y,
+                    newSize.Width, newSize.Height, SWP_SHOWWINDOW);
+
+                return WindowActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return WindowActionResult.UnknownError;
+            }
         }
 
         //  --------------------------------------------------------------------------------
         /// <summary> Move window on screen. </summary>
         /// <param name="windowInfo"> Window information. </param>
         /// <param name="newPosition"> New window position. </param>
-        public void MoveWindow(WindowInfo windowInfo, POINT newPosition)
+        public WindowActionResult MoveWindow(WindowInfo windowInfo, POINT newPosition)
         {
-            SetWindowPos(windowInfo.Handle, IntPtr.Zero, newPosition.X, newPosition.Y,
-                windowInfo.Size.Width, windowInfo.Size.Height, SWP_SHOWWINDOW);
+            try
+            {
+                if (!IsWindowAlive(windowInfo, out IntPtr windowHandle, out Process? process))
+                {
+                    if (process == null)
+                        return WindowActionResult.ProcessNotExist;
+                    else
+                        return WindowActionResult.WindowNotExist;
+                }
+
+                SetWindowPos(windowInfo.Handle, IntPtr.Zero, newPosition.X, newPosition.Y,
+                    windowInfo.Size.Width, windowInfo.Size.Height, SWP_SHOWWINDOW);
+
+                return WindowActionResult.Success;
+            }
+            catch (Exception)
+            {
+                return WindowActionResult.UnknownError;
+            }
         }
 
         #endregion WINDOWS METHODS
