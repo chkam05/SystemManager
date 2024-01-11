@@ -1,25 +1,20 @@
 ﻿MACRO RUNNER:
-	- BackgroundWorker logic
+	- Add TextBox, that will enter text virtually.
 
-PROCESSES
-	- Porcesses detector
-	- Windows detector
-	- Getting Handles
+PROCESSES:
+	- Live update (for process and window)
 
 FILES
-	- Files listing
+	- Files listing (List, Tree)
 	- Copying files
 	- Moving files
+	- Deleting files
 	- Opening and Saving text files
 
 SCREENSHOT
 	- To File
-	- To Memory
+	- To Memory (visible in app window)
 
 CLIPBOARD
-	- Read
-	- Write
-
-REGEIDT
-	- Read
-	- Write
+	- Get / Set
+	- Live view
