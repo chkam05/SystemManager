@@ -40,6 +40,8 @@ namespace SystemManager.Data.Processes
         private ObservableCollection<ProcessInfoViewModel>? _processes;
         private ObservableCollection<ProcessInfoViewModel>? _processesFiltered;
 
+        private AutoProcessesUpdater _processesAutoUpdater;
+
         private string _filterText;
 
         public ProcessManager ProcessManager;
@@ -109,6 +111,11 @@ namespace SystemManager.Data.Processes
             get => !string.IsNullOrEmpty(_filterText) && !string.IsNullOrWhiteSpace(_filterText);
         }
 
+        public bool IsProcessesAutoUpdating
+        {
+            get => false;
+        }
+
         public bool IsProcessesLoading
         {
             get => _processesLoaderBackgroundWorker != null && _processesLoaderBackgroundWorker.IsBusy;
@@ -145,6 +152,84 @@ namespace SystemManager.Data.Processes
         }
 
         #endregion CLASS METHODS
+
+        #region AUTO UPDATER METHODS
+
+        //  --------------------------------------------------------------------------------
+        public void StartProcessesAutoUpdater()
+        {
+            if (_processesAutoUpdater != null && _processesAutoUpdater.IsRunning)
+                return;
+
+            _processesAutoUpdater = new AutoProcessesUpdater(
+                Processes.Select(p => p.ProcessInfo), ProcessManager);
+
+            _processesAutoUpdater.StartAutoUpdater();
+
+            OnPropertyChanged(nameof(IsProcessesAutoUpdating));
+        }
+
+        //  --------------------------------------------------------------------------------
+        public void StopProcessesAutoUpdater()
+        {
+            if (_processesAutoUpdater == null || !_processesAutoUpdater.IsRunning)
+                return;
+
+            _processesAutoUpdater.StopAutoUpdater();
+
+            OnPropertyChanged(nameof(IsProcessesAutoUpdating));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after processes auto updater update process. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Auto Process Update Event Arguments. </param>
+        public void ProcessesAutoUpdaterFinished(object? sender, AutoProcessUpdateEventArgs e)
+        {
+            if (e.ChangeIndication)
+            {
+                switch (e.ComparationResult)
+                {
+                    case ProcessCompareResult.NotEqual:
+                        if (e.CurrentProcess != null && e.NewProcess != null)
+                        {
+                            var currentProcessViewModel = Processes.FirstOrDefault(p => p.Id == e.CurrentProcess.Id);
+
+                            if (currentProcessViewModel != null)
+                                currentProcessViewModel.Update(e.NewProcess);
+                        }
+                        break;
+
+                    case ProcessCompareResult.New:
+                        if (e.NewProcess != null)
+                        {
+                            Processes.Add(new ProcessInfoViewModel(e.NewProcess));
+                        }
+                        break;
+
+                    case ProcessCompareResult.Removed:
+                        if (e.CurrentProcess != null)
+                        {
+                            var currentProcessViewModel = Processes.FirstOrDefault(p => p.Id == e.CurrentProcess.Id);
+
+                            if (currentProcessViewModel != null)
+                                Processes.Remove(currentProcessViewModel);
+                        }
+                        break;
+                }
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after process auto updater finished work. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Auto Process Update Finished Event Arguments. </param>
+        public void ProcessesAutoUpdaterUpdated(object? sender, AutoProcessUpdateFinishedEventArgs e)
+        {
+            OnPropertyChanged(nameof(IsProcessesAutoUpdating));
+        }
+
+        #endregion AUTO UPDATER METHODS
 
         #region FILTERING METHODS
 

@@ -171,6 +171,44 @@ namespace SystemManager.ViewModels.Processes
         {
             ProcessInfo = processInfo;
 
+            OnProcessInfoPropertyUpdate();
+        }
+
+        #endregion CLASS METHODS
+
+        #region COMPARATION METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Determines whether the specified object is equal to the current object. </summary>
+        /// <param name="obj"> Object to compare. </param>
+        /// <returns> True - object is equal to the current object; False - otherwise. </returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+                return false;
+
+            if (obj is ProcessInfoViewModel processInfoViewModel)
+                return processInfoViewModel.GetHashCode() == GetHashCode();
+
+            return false;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Serves as the default hash function. </summary>
+        /// <returns> A hash code for the current object. </returns>
+        public override int GetHashCode()
+        {
+            return ProcessInfo.GetHashCode();
+        }
+
+        #endregion COMPARATION METHODS
+
+        #region PROPERITES CHANGED METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Triggers properies, related with ProcessInfo to be updated in the UI. </summary>
+        private void OnProcessInfoPropertyUpdate()
+        {
             OnPropertyChanged(nameof(Id));
             OnPropertyChanged(nameof(Name));
             OnPropertyChanged(nameof(Description));
@@ -187,7 +225,21 @@ namespace SystemManager.ViewModels.Processes
             OnPropertyChanged(nameof(UserName));
         }
 
-        #endregion CLASS METHODS
+        #endregion PROPERITES CHANGED METHODS
+
+        #region UPDATE METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Update process information. </summary>
+        /// <param name="processInfo"> Process information. </param>
+        public void Update(ProcessInfo processInfo)
+        {
+            ProcessInfo = processInfo;
+
+            OnProcessInfoPropertyUpdate();
+        }
+
+        #endregion UPDATE METHODS
 
     }
 }
