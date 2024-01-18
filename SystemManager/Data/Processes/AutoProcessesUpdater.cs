@@ -147,7 +147,7 @@ namespace SystemManager.Data.Processes
                     newProcesses = _processManager.GetProcesses(out List<Exception> exceptions);
 
                     if (IsCancelled(bgWorker, e))
-                            return;
+                        return;
 
                     if (exceptions.Any())
                     {
@@ -288,13 +288,13 @@ namespace SystemManager.Data.Processes
         private Dictionary<int, Tuple<ProcessInfo?, ProcessInfo?>> GroupProcesses(
             List<ProcessInfo> currentProcesses, List<ProcessInfo> newProcesses)
         {
-            return currentProcesses
+            return currentProcesses.Concat(newProcesses)
                 .GroupBy(process => process.Id)
                 .ToDictionary(
                     group => group.Key,
                     group => new Tuple<ProcessInfo?, ProcessInfo?>(
-                        group.FirstOrDefault(p => currentProcesses.Contains(p)),
-                        group.FirstOrDefault(p => newProcesses.Contains(p)))
+                        group.FirstOrDefault(p => currentProcesses.Contains(p)) ?? null,
+                        group.FirstOrDefault(p => newProcesses.Contains(p)) ?? null)
                 );
         }
 

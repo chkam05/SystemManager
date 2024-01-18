@@ -55,16 +55,23 @@
     <!-- CONTROL TEMPLATE -->
 
     <ControlTemplate x:Key="MainMenuControlControlTemplate" TargetType="{x:Type ctrls:MainMenuControl}">
-        <cex:ScrollViewerEx
-            HorizontalScrollBarVisibility="Disabled"
-            VerticalScrollBarVisibility="Auto">
+        <Border
+            CornerRadius="0,0,0,8"
+            ClipToBounds="True"
+            SnapsToDevicePixels="True">
             
-            <cex:ListViewEx
-                x:Name="PART_ListViewEx"
-                ItemsSource="{TemplateBinding MenuItems}"
-                ItemTemplate="{StaticResource MainMenuItemDataTemplate}"
-                SelectionMode="Single"/>
-        </cex:ScrollViewerEx>
+            <cex:ScrollViewerEx
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+
+                <cex:ListViewEx
+                    x:Name="PART_ListViewEx"
+                    ItemsSource="{TemplateBinding MenuItems}"
+                    ItemTemplate="{StaticResource MainMenuItemDataTemplate}"
+                    SelectionMode="Single"/>
+            </cex:ScrollViewerEx>
+            
+        </Border>
     </ControlTemplate>
     
     

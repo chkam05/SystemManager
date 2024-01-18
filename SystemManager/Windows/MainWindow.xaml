@@ -29,46 +29,35 @@
     Loaded="WindowLoaded"
     Closing="WindowExClosing">
 
-    <Grid>
+    <Border
+        CornerRadius="0,0,8,8"
+        ClipToBounds="True"
+        SnapsToDevicePixels="True">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="224"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Grid>
 
-        <ctrls:MainMenuControl
-            Grid.Column="0"
-            MenuItems="{Binding MainMenuItems}"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="255"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Border
-            Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
-            BorderBrush="{x:Null}"
-            BorderThickness="0"
-            Grid.Column="1"
-            Width="10">
+            <ctrls:MainMenuControl
+                Grid.Column="0"
+                MenuItems="{Binding MainMenuItems}"/>
 
-            <materialDesign:PackIcon
-                Foreground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
-                Height="16"
-                HorizontalAlignment="Center"
-                Kind="DotsVertical"
-                VerticalAlignment="Center"
-                Width="16"/>
+            <ctrls:PagesControl
+                x:Name="_pagesControl"
+                Grid.Column="1"/>
 
-        </Border>
+            <cexIM:InternalMessagesExContainer
+                x:Name="_internalMessagesExContainer"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"/>
 
-        <ctrls:PagesControl
-            x:Name="_pagesControl"
-            Grid.Column="2"/>
+        </Grid>
 
-        <cexIM:InternalMessagesExContainer
-            x:Name="_internalMessagesExContainer"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"/>
-
-    </Grid>
+    </Border>
 
 </cexWin:WindowEx>

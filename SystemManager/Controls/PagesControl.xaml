@@ -11,9 +11,16 @@
     d:DesignHeight="450"
     d:DesignWidth="800">
 
-    <Frame
-        x:Name="contentFrame"
-        NavigationUIVisibility="Hidden"
-        Navigated="ContentFrameNavigated"/>
+    <Border
+        CornerRadius="0,0,8,8"
+        ClipToBounds="True"
+        SnapsToDevicePixels="True">
+        
+        <Frame
+            x:Name="contentFrame"
+            NavigationUIVisibility="Hidden"
+            Navigated="ContentFrameNavigated"/>
+        
+    </Border>
 
 </UserControl>

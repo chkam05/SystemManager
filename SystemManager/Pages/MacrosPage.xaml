@@ -520,7 +520,10 @@
     <Border
         Background="White"
         BorderBrush="{x:Null}"
-        BorderThickness="0">
+        BorderThickness="0"
+        CornerRadius="0,0,8,0"
+        ClipToBounds="True"
+        SnapsToDevicePixels="True">
 
         <Grid>
 
@@ -531,7 +534,7 @@
             </Grid.RowDefinitions>
 
             <Border
-                Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
                 BorderBrush="{x:Null}"
                 BorderThickness="0"
                 Grid.Row="0"
@@ -719,11 +722,14 @@
             </cex:ListViewEx>
 
             <Border
-                Background="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
                 BorderBrush="{x:Null}"
                 BorderThickness="0"
+                CornerRadius="0,0,8,0"
+                ClipToBounds="True"
                 Grid.Row="2"
-                Padding="8">
+                Padding="8"
+                SnapsToDevicePixels="True">
 
                 <StackPanel
                     Orientation="Horizontal">
