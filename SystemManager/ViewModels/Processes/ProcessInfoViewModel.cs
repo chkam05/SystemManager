@@ -109,7 +109,7 @@ namespace SystemManager.ViewModels.Processes
             }
         }
 
-        public ProcessMode Mode
+        public ProcessMode? Mode
         {
             get => ProcessInfo.Mode;
             set

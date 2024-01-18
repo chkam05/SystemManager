@@ -112,6 +112,8 @@ namespace SystemManager.Data.Processes
             _bgUpdater.DoWork += UpdaterWork;
             _bgUpdater.ProgressChanged += UpdaterProgressChanged;
             _bgUpdater.RunWorkerCompleted += UpdaterWorkCompleted;
+
+            _bgUpdater.RunWorkerAsync();
         }
 
         //  --------------------------------------------------------------------------------
@@ -183,7 +185,7 @@ namespace SystemManager.Data.Processes
                     if (comparationResult != ProcessCompareResult.Equal)
                     {
                         var progressReport = new AutoProcessUpdateEventArgs(true,
-                            ProcessCompareResult.NotEqual,
+                            comparationResult,
                             processes.Value.Item1,
                             processes.Value.Item2);
 

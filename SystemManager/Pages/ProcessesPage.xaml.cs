@@ -117,7 +117,10 @@ namespace SystemManager.Pages
         /// <param name="e"> Routed Event Args. </param>
         private void AutoRefreshButtonExClick(object sender, RoutedEventArgs e)
         {
-            //
+            if (!_processesDataContext.IsProcessesAutoUpdating)
+                _processesDataContext.StartProcessesAutoUpdater();
+            else
+                _processesDataContext.StopProcessesAutoUpdater();
         }
 
         //  --------------------------------------------------------------------------------

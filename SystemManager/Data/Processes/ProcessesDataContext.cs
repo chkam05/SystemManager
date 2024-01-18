@@ -40,7 +40,7 @@ namespace SystemManager.Data.Processes
         private ObservableCollection<ProcessInfoViewModel>? _processes;
         private ObservableCollection<ProcessInfoViewModel>? _processesFiltered;
 
-        private AutoProcessesUpdater _processesAutoUpdater;
+        private AutoProcessesUpdater? _processesAutoUpdater;
 
         private string _filterText;
 
@@ -113,7 +113,7 @@ namespace SystemManager.Data.Processes
 
         public bool IsProcessesAutoUpdating
         {
-            get => false;
+            get => _processesAutoUpdater?.IsRunning ?? false;
         }
 
         public bool IsProcessesLoading
@@ -156,20 +156,27 @@ namespace SystemManager.Data.Processes
         #region AUTO UPDATER METHODS
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Start processes auto updater. </summary>
         public void StartProcessesAutoUpdater()
         {
             if (_processesAutoUpdater != null && _processesAutoUpdater.IsRunning)
                 return;
 
+            if (_processesLoaderBackgroundWorker != null && _processesLoaderBackgroundWorker.IsBusy)
+                StopLoadingProcesses();
+
             _processesAutoUpdater = new AutoProcessesUpdater(
                 Processes.Select(p => p.ProcessInfo), ProcessManager);
 
+            _processesAutoUpdater.Update += ProcessesAutoUpdaterUpdated;
+            _processesAutoUpdater.UpdateFinished += ProcessesAutoUpdaterFinished;
             _processesAutoUpdater.StartAutoUpdater();
 
             OnPropertyChanged(nameof(IsProcessesAutoUpdating));
         }
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Stop processes auto updater. </summary>
         public void StopProcessesAutoUpdater()
         {
             if (_processesAutoUpdater == null || !_processesAutoUpdater.IsRunning)
@@ -184,7 +191,7 @@ namespace SystemManager.Data.Processes
         /// <summary> Method invoked after processes auto updater update process. </summary>
         /// <param name="sender"> Object that invoked the method. </param>
         /// <param name="e"> Auto Process Update Event Arguments. </param>
-        public void ProcessesAutoUpdaterFinished(object? sender, AutoProcessUpdateEventArgs e)
+        public void ProcessesAutoUpdaterUpdated(object? sender, AutoProcessUpdateEventArgs e)
         {
             if (e.ChangeIndication)
             {
@@ -196,14 +203,32 @@ namespace SystemManager.Data.Processes
                             var currentProcessViewModel = Processes.FirstOrDefault(p => p.Id == e.CurrentProcess.Id);
 
                             if (currentProcessViewModel != null)
+                            {
                                 currentProcessViewModel.Update(e.NewProcess);
+
+                                if (IsFilterMode)
+                                {
+                                    var filteredProcessViewModel = ProcessesFiltered.FirstOrDefault(p => p.Id == e.CurrentProcess.Id);
+
+                                    if (filteredProcessViewModel != null)
+                                        filteredProcessViewModel.Update(e.NewProcess);
+
+                                    else if (FilterProcessInfoViewModel(currentProcessViewModel, FilterText))
+                                        ProcessesFiltered.Add(currentProcessViewModel);
+                                }
+                            }
                         }
                         break;
 
                     case ProcessCompareResult.New:
                         if (e.NewProcess != null)
                         {
-                            Processes.Add(new ProcessInfoViewModel(e.NewProcess));
+                            var newProcessInfoViewModel = new ProcessInfoViewModel(e.NewProcess);
+
+                            Processes.Add(newProcessInfoViewModel);
+
+                            if (FilterProcessInfoViewModel(newProcessInfoViewModel, FilterText))
+                                ProcessesFiltered.Add(newProcessInfoViewModel);
                         }
                         break;
 
@@ -213,7 +238,12 @@ namespace SystemManager.Data.Processes
                             var currentProcessViewModel = Processes.FirstOrDefault(p => p.Id == e.CurrentProcess.Id);
 
                             if (currentProcessViewModel != null)
+                            {
                                 Processes.Remove(currentProcessViewModel);
+
+                                if (ProcessesFiltered.Contains(currentProcessViewModel))
+                                    ProcessesFiltered.Remove(currentProcessViewModel);
+                            }
                         }
                         break;
                 }
@@ -224,7 +254,7 @@ namespace SystemManager.Data.Processes
         /// <summary> Method invoked after process auto updater finished work. </summary>
         /// <param name="sender"> Object that invoked the method. </param>
         /// <param name="e"> Auto Process Update Finished Event Arguments. </param>
-        public void ProcessesAutoUpdaterUpdated(object? sender, AutoProcessUpdateFinishedEventArgs e)
+        public void ProcessesAutoUpdaterFinished(object? sender, AutoProcessUpdateFinishedEventArgs e)
         {
             OnPropertyChanged(nameof(IsProcessesAutoUpdating));
         }

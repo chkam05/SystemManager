@@ -527,9 +527,8 @@
 
                         <cex:ButtonEx
                             Content="Auto Refresh"
-                            IconKind="CheckBoxOutlineBlank"
-                            Click="AutoRefreshButtonExClick"
-                            Visibility="Collapsed"/>
+                            IconKind="{Binding IsProcessesAutoUpdating, Mode=OneWay, Converter={StaticResource AutoRefreshIconKindConverter}}"
+                            Click="AutoRefreshButtonExClick"/>
 
                     </StackPanel>
 
@@ -633,7 +632,20 @@
 
                         <cex:ButtonEx
                             IconKind="{Binding IsProcessesLoading, Mode=OneWay, Converter={StaticResource ProcessLoadStateIconKindConverter}, ConverterParameter={x:Static convProc:ProcessLoadStateIconKindConverterParam.RefreshButton}}"
-                            Click="RefreshButtonExClick"/>
+                            Click="RefreshButtonExClick">
+                            
+                            <cex:ButtonEx.Style>
+                                <Style BasedOn="{StaticResource ButtonExStyle}" TargetType="{x:Type cex:ButtonEx}">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                    
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsProcessesAutoUpdating}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </cex:ButtonEx.Style>
+                        </cex:ButtonEx>
 
                     </StackPanel>
 
