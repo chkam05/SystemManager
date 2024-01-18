@@ -18,6 +18,278 @@ using SystemManager.ViewModels.Processes;
 
 namespace SystemManager.Data.Processes
 {
+
+    public class NewProcessesDataContext : BaseViewModel, IDisposable
+    {
+
+        //  VARIABLES
+
+        private ProcessesAsyncGetter _processesAsyncGetter;
+        private bool _isAutoUpdate = false;
+
+        private ObservableCollection<ProcessInfoViewModel>? _filteredProcesses;
+        private ObservableCollection<ProcessInfoViewModel>? _processes;
+
+        private string _filterText = string.Empty;
+
+        public ProcessManager ProcessManager;
+
+
+        //  GETTERS & SETTERS
+
+        public ObservableCollection<ProcessInfoViewModel> Processes
+        {
+            get
+            {
+                if (_processes == null)
+                {
+                    _processes = new ObservableCollection<ProcessInfoViewModel>();
+                    _processes.CollectionChanged += OnProcessesCollectionChanged;
+                }
+
+                return _processes;
+            }
+            set
+            {
+                _processes = value;
+                _processes.CollectionChanged += OnProcessesCollectionChanged;
+                OnPropertyChanged(nameof(Processes));
+                OnPropertyChanged(nameof(ProcessesCount));
+            }
+        }
+
+        public ObservableCollection<ProcessInfoViewModel> ProcessesFiltered
+        {
+            get
+            {
+                if (_filteredProcesses == null)
+                {
+                    _filteredProcesses = new ObservableCollection<ProcessInfoViewModel>();
+                    _filteredProcesses.CollectionChanged += OnFilteredProcessesCollectionChanged;
+                }
+
+                return _filteredProcesses;
+            }
+            set
+            {
+                _filteredProcesses = value;
+                _filteredProcesses.CollectionChanged += OnFilteredProcessesCollectionChanged;
+                OnPropertyChanged(nameof(ProcessesFiltered));
+            }
+        }
+
+        public string FilterText
+        {
+            get => _filterText;
+            set
+            {
+                UpdateProperty(ref _filterText, value);
+                OnPropertyChanged(nameof(IsFilterMode));
+                FilterProcesses();
+            }
+        }
+
+        public bool IsAutoUpdate
+        {
+            get => _isAutoUpdate;
+            private set
+            {
+                UpdateProperty(ref _isAutoUpdate, value);
+            }
+        }
+
+        public bool IsFilterMode
+        {
+            get => !string.IsNullOrEmpty(_filterText) && !string.IsNullOrWhiteSpace(_filterText);
+        }
+
+        public bool IsLoading
+        {
+            get => _processesAsyncGetter.IsRunning;
+        }
+
+        public int ProcessesCount
+        {
+            get => Processes.Count;
+        }
+
+
+
+        //  METHODS
+
+        #region CLASS METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> NewProcessesDataContext class constructor. </summary>
+        public NewProcessesDataContext()
+        {
+            ProcessManager = new ProcessManager();
+            Processes = new ObservableCollection<ProcessInfoViewModel>();
+            ProcessesFiltered = new ObservableCollection<ProcessInfoViewModel>();
+
+            _processesAsyncGetter = new ProcessesAsyncGetter(
+                ProcessManager,
+                Processes.Select(p => p.ProcessInfo));
+
+            _processesAsyncGetter.Update += OnProcessUpdate;
+            _processesAsyncGetter.UpdateFinished += OnProcessesUpdateFinished;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Performs tasks associated with freeing, releasing, or resetting unmanaged resources. </summary>
+        public void Dispose()
+        {
+            //
+        }
+
+        #endregion CLASS METHODS
+
+        #region FILTER PROCESSES
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Filter processes. </summary>
+        private void FilterProcesses()
+        {
+            if (!IsFilterMode)
+            {
+                ProcessesFiltered.Clear();
+                return;
+            }
+
+            ProcessesFiltered.Clear();
+            ProcessesFiltered = new ObservableCollection<ProcessInfoViewModel>(Processes.Where(
+                p => FilterSingleProcess(p, _filterText)));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Filter single process. </summary>
+        /// <param name="processInfoViewModel"> Process info view model. </param>
+        /// <param name="searchText"> Query text. </param>
+        /// <returns> True - process info item match query; False - otherwise. </returns>
+        private bool FilterSingleProcess(ProcessInfoViewModel processInfoViewModel, string searchText)
+        {
+            var processInfoOption = ConfigManager.Instance.Config.ProcessInfoOptions;
+            bool queryResult = false;
+
+            if (processInfoOption.Name && processInfoViewModel.Name != null)
+                queryResult = processInfoViewModel.Name.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            if (processInfoOption.Description && processInfoViewModel.Description != null)
+                queryResult = processInfoViewModel.Description.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            if (processInfoOption.CommandLocation && processInfoViewModel.CommandLocation != null)
+                queryResult = processInfoViewModel.CommandLocation.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            if (processInfoOption.UserName && processInfoViewModel.UserName != null)
+                queryResult = processInfoViewModel.UserName.ToLower().Contains(searchText.ToLower())
+                    ? true
+                    : queryResult;
+
+            return queryResult;
+        }
+
+        #endregion FILTER PROCESSES
+
+        #region PROCESSES GETTER METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Start loading processes. </summary>
+        /// <param name="autoUpdate"> Auto update mode. </param>
+        public void LoadProcesses(bool autoUpdate = false)
+        {
+            if (_processesAsyncGetter.IsRunning)
+                return;
+
+            IsAutoUpdate = autoUpdate;
+            _processesAsyncGetter.Run(autoUpdate);
+
+            OnPropertyChanged(nameof(IsLoading));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Stop loading processes. </summary>
+        public void StopLoadingProcesses()
+        {
+            if (_processesAsyncGetter.IsRunning)
+                _processesAsyncGetter.Stop();
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after process update. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Processes Getter Update Event Arguments. </param>
+        public void OnProcessUpdate(object? sender, ProcessesGetterUpdateEventArgs e)
+        {
+            if (!e.ChangeIndication)
+                return;
+
+            switch (e.ComparationResult)
+            {
+                case ProcessCompareResult.Equal:
+                    break;
+
+                case ProcessCompareResult.NotEqual:
+                    break;
+
+                case ProcessCompareResult.New:
+                    break;
+
+                case ProcessCompareResult.Removed:
+                    break;
+            }
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after finished processes update. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Processes Getter Update Finished Event Arguments. </param>
+        public void OnProcessesUpdateFinished(object? sender, ProgressesGetterUpdateFinishedEventArgs e)
+        {
+            IsAutoUpdate = false;
+            OnPropertyChanged(nameof(IsLoading));
+        }
+
+        #endregion PROCESSES GETTER METHODS
+
+        #region PROPERITES CHANGED METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after Processes collection change. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Notify Collection Changed Event Arguments. </param>
+        private void OnProcessesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Processes));
+            OnPropertyChanged(nameof(ProcessesCount));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after FilteredProcesses collection change. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Notify Collection Changed Event Arguments. </param>
+        private void OnFilteredProcessesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(ProcessesFiltered));
+        }
+
+        #endregion PROPERITES CHANGED METHODS
+
+        #region WINDOWS GETTER METHODS
+
+        //  --------------------------------------------------------------------------------
+
+        #endregion WINDOWS GETTER METHODS
+
+    }
+
+
+
     public class ProcessesDataContext : BaseViewModel, IDisposable
     {
 
