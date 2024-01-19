@@ -64,7 +64,7 @@ namespace SystemManager.Pages
         /// <summary> Method invoked after loading processes. </summary>
         /// <param name="sender"> Object that invoked the method. </param>
         /// <param name="e"> Processes Loaded Finished Event Arguments. </param>
-        public void OnProcessesLoaded(object? sender, ProcessesLoaderFinishedEventArgs e)
+        public void OnProcessesLoaded(object? sender, ProcessesGetterUpdateFinishedEventArgs e)
         {
             if (e.Exception != null)
             {
@@ -82,7 +82,7 @@ namespace SystemManager.Pages
         /// <summary> Method invoked after loading windows. </summary>
         /// <param name="sender"> Object that invoked the method. </param>
         /// <param name="e"> Processes Loaded Finished Event Arguments. </param>
-        public void OnWindowsLoaded(object? sender, WindowsLoaderFinishedEventArgs e)
+        public void OnWindowsLoaded(object? sender, WindowsGetterUpdateFinishedEventArgs e)
         {
             _imContainer.CurrentMessage?.Close();
 
@@ -117,10 +117,10 @@ namespace SystemManager.Pages
         /// <param name="e"> Routed Event Args. </param>
         private void AutoRefreshButtonExClick(object sender, RoutedEventArgs e)
         {
-            if (!_processesDataContext.IsProcessesAutoUpdating)
-                _processesDataContext.StartProcessesAutoUpdater();
+            if (!_processesDataContext.IsAutoUpdate)
+                _processesDataContext.LoadProcesses(true);
             else
-                _processesDataContext.StopProcessesAutoUpdater();
+                _processesDataContext.StopLoadingProcesses();
         }
 
         //  --------------------------------------------------------------------------------

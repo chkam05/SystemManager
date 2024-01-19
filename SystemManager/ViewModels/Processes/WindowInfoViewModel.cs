@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using SystemController.Data;
 using SystemController.ProcessesManagement.Data;
 using SystemManager.ViewModels.Base;
@@ -214,6 +215,53 @@ namespace SystemManager.ViewModels.Processes
                 ? new WindowInfoViewModel(windowInfo.ParentWindow)
                 : null;
 
+            OnWindowInfoPropertyUpdate();
+        }
+
+        #endregion CLASS METHODS
+
+        #region COMPARATION METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Determines whether the specified object is equal to the current object. </summary>
+        /// <param name="obj"> Object to compare. </param>
+        /// <returns> True - object is equal to the current object; False - otherwise. </returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+                return false;
+
+            if (obj is WindowInfoViewModel windowInfoViewModel)
+                return windowInfoViewModel.GetHashCode() == GetHashCode();
+
+            return false;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Serves as the default hash function. </summary>
+        /// <returns> A hash code for the current object. </returns>
+        public override int GetHashCode()
+        {
+            return WindowInfo.GetHashCode();
+        }
+
+        #endregion COMPARATION METHODS
+
+        #region PROPERITES CHANGED METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Method invoked after ChildWindows collection changed. </summary>
+        /// <param name="sender"> Object that invoked the method. </param>
+        /// <param name="e"> Notify Collection Changed Event Arguments. </param>
+        private void OnChildWindowsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(ChildWindows));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Triggers properies, related with WindowInfo to be updated in the UI. </summary>
+        private void OnWindowInfoPropertyUpdate()
+        {
             OnPropertyChanged(nameof(ChildWindows));
             OnPropertyChanged(nameof(HasChildWindows));
             OnPropertyChanged(nameof(ParentWindow));
@@ -233,20 +281,86 @@ namespace SystemManager.ViewModels.Processes
             OnPropertyChanged(nameof(Visible));
         }
 
-        #endregion CLASS METHODS
+        #endregion PROPERITES CHANGED METHODS
 
-        #region PROPERITES CHANGED METHODS
+        #region UPDATE METHODS
 
         //  --------------------------------------------------------------------------------
-        /// <summary> Method invoked after ChildWindows collection changed. </summary>
-        /// <param name="sender"> Object that invoked the method. </param>
-        /// <param name="e"> Notify Collection Changed Event Arguments. </param>
-        private void OnChildWindowsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        /// <summary> Update window information. </summary>
+        /// <param name="windowInfo"> Window information. </param>
+        /// <param name="allowParentUpdate"> Allow parent window update. </param>
+        /// <param name="allowChildUpdate"> allow child window update. </param>
+        public void Update(WindowInfo windowInfo, bool allowParentUpdate = true, bool allowChildUpdate = true)
         {
-            OnPropertyChanged(nameof(ChildWindows));
+            WindowInfo = windowInfo;
+
+            if (allowParentUpdate)
+                UpdateParentWindow(windowInfo.ParentWindow);
+
+            if (allowChildUpdate)
+                UpdateChildWindows(windowInfo.ChildWindows);
+
+            OnWindowInfoPropertyUpdate();
         }
 
-        #endregion PROPERITES CHANGED METHODS
+        //  --------------------------------------------------------------------------------
+        /// <summary> Update child windows information. </summary>
+        /// <param name="childWindowsInfo"> Child windows information collection. </param>
+        private void UpdateChildWindows(IEnumerable<WindowInfo>? childWindowsInfo)
+        {
+            if (childWindowsInfo == null || !childWindowsInfo.Any())
+            {
+                ChildWindows = new ObservableCollection<WindowInfoViewModel>();
+                return;
+            }
+
+            if (!ChildWindows.Any() && (childWindowsInfo?.Any() ?? false))
+            {
+                ChildWindows = new ObservableCollection<WindowInfoViewModel>(childWindowsInfo.Select(w => new WindowInfoViewModel(w)));
+                return;
+            }
+
+            var bothWindows = childWindowsInfo?.Where(w => ChildWindows.Any(cw => cw.WindowInfo.Handle == w.Handle)) ?? new List<WindowInfo>();
+            var newWindows = childWindowsInfo?.Where(w => !bothWindows.Any(cw => cw.Handle == w.Handle)) ?? new List<WindowInfo>();
+            var oldWindows = ChildWindows.Where(cw => !bothWindows.Any(w => w.Handle == cw.WindowInfo.Handle));
+
+            if (oldWindows.Any())
+                foreach (var window in oldWindows)
+                    ChildWindows.Remove(window);
+
+            if (bothWindows.Any())
+                foreach (var window in bothWindows)
+                {
+                    var currentWindow = ChildWindows.First(w => w.WindowInfo.Handle == window.Handle);
+                    currentWindow.Update(window, allowParentUpdate: false);
+                }
+
+            if (newWindows.Any())
+                foreach (var window in newWindows)
+                    ChildWindows.Add(new WindowInfoViewModel(window));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Update parent window information. </summary>
+        /// <param name="parentWindowInfo"> Parent window information. </param>
+        private void UpdateParentWindow(WindowInfo? parentWindowInfo)
+        {
+            if (parentWindowInfo == null)
+            {
+                ParentWindow = null;
+                return;
+            }
+
+            if (ParentWindow == null)
+            {
+                ParentWindow = new WindowInfoViewModel(parentWindowInfo);
+                return;
+            }
+
+            ParentWindow.Update(parentWindowInfo, allowChildUpdate: false);
+        }
+
+        #endregion UPDATE METHODS
 
     }
 }

@@ -530,7 +530,7 @@
 
                         <cex:ButtonEx
                             Content="Auto Refresh"
-                            IconKind="{Binding IsProcessesAutoUpdating, Mode=OneWay, Converter={StaticResource AutoRefreshIconKindConverter}}"
+                            IconKind="{Binding IsAutoUpdate, Mode=OneWay, Converter={StaticResource AutoRefreshIconKindConverter}}"
                             Click="AutoRefreshButtonExClick"/>
 
                     </StackPanel>
@@ -634,7 +634,7 @@
                         </cex:ButtonEx>
 
                         <cex:ButtonEx
-                            IconKind="{Binding IsProcessesLoading, Mode=OneWay, Converter={StaticResource ProcessLoadStateIconKindConverter}, ConverterParameter={x:Static convProc:ProcessLoadStateIconKindConverterParam.RefreshButton}}"
+                            IconKind="{Binding IsLoading, Mode=OneWay, Converter={StaticResource ProcessLoadStateIconKindConverter}, ConverterParameter={x:Static convProc:ProcessLoadStateIconKindConverterParam.RefreshButton}}"
                             Click="RefreshButtonExClick">
                             
                             <cex:ButtonEx.Style>
@@ -642,7 +642,7 @@
                                     <Setter Property="IsEnabled" Value="True"/>
                                     
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsProcessesAutoUpdating}" Value="True">
+                                        <DataTrigger Binding="{Binding IsAutoUpdate}" Value="True">
                                             <Setter Property="IsEnabled" Value="False"/>
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -690,7 +690,7 @@
                     Orientation="Horizontal">
 
                     <materialDesign:PackIcon
-                        Kind="{Binding IsProcessesLoading, Mode=OneWay, Converter={StaticResource ProcessLoadStateIconKindConverter}, ConverterParameter={x:Static convProc:ProcessLoadStateIconKindConverterParam.StatusBarIcon}}"
+                        Kind="{Binding IsLoading, Mode=OneWay, Converter={StaticResource ProcessLoadStateIconKindConverter}, ConverterParameter={x:Static convProc:ProcessLoadStateIconKindConverterParam.StatusBarIcon}}"
                         Style="{StaticResource StatusBarPackIconStyle}"/>
 
                     <TextBlock>
@@ -699,10 +699,10 @@
                                 <Setter Property="Text" Value="{Binding ProcessesCount}"/>
 
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsProcessesLoading}" Value="True">
+                                    <DataTrigger Binding="{Binding IsLoading}" Value="True">
                                         <Setter Property="Text" Value="Loading ..."/>
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsProcessesLoading}" Value="False">
+                                    <DataTrigger Binding="{Binding IsLoading}" Value="False">
                                         <Setter Property="Text" Value="{Binding ProcessesCount}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
