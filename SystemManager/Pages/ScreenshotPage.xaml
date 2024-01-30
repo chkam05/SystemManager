@@ -1,0 +1,103 @@
+﻿<Page
+    x:Class="SystemManager.Pages.ScreenshotPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SystemManager.Pages"
+    mc:Ignorable="d" 
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    
+    Background="Transparent"
+    Foreground="White"
+    Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- STATIC -->
+
+            <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+            <x:Static x:Key="ConfigManager" Member="cfg:ConfigManager.Instance"/>
+
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Border
+        Background="White"
+        BorderBrush="{x:Null}"
+        BorderThickness="0"
+        CornerRadius="0,0,8,0"
+        ClipToBounds="True"
+        SnapsToDevicePixels="True">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border
+                Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                BorderBrush="{x:Null}"
+                BorderThickness="0"
+                Grid.Row="0"
+                Padding="8">
+
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+
+                        <cex:ButtonEx
+                            Content="All Screens"
+                            IconKind="MonitorMultiple"
+                            Click="AllScrensCaptureButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Main Screen"
+                            IconKind="MonitorStar"
+                            Click="MainScreenCaptureButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Select Area"
+                            IconKind="SelectionDrag"
+                            Click="AreaCaptureButtonExClick"/>
+
+                        <cex:ButtonEx
+                            Content="Select Screen"
+                            IconKind="MonitorClean"
+                            Click="ScreenCaptureButtonExClick"/>
+
+                    </StackPanel>
+
+                </Grid>
+
+            </Border>
+
+            <Image
+                Grid.Row="1"
+                Margin="16"
+                Source="{Binding CapturedScreen}"/>
+
+        </Grid>
+
+    </Border>
+    
+</Page>

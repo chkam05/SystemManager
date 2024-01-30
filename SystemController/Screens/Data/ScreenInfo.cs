@@ -71,5 +71,102 @@ namespace SystemController.Screens.Data
                 VirtualWorkSize.Height);
         }
 
+
+        //  METHODS
+
+        #region MAP METHODS
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if point is in virtual area. </summary>
+        /// <param name="virtualPoint"> Virtual point. </param>
+        /// <returns> True - point is in virtual area. </returns>
+        public bool IsInVirtualRange(Point virtualPoint)
+        {
+            return IsInVirtualRange(virtualPoint.X, virtualPoint.Y);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if point is in virtual area. </summary>
+        /// <param name="x"> X point. </param>
+        /// <param name="y"> Y point. </param>
+        /// <returns> True - point is in virtual area. </returns>
+        public bool IsInVirtualRange(double x, double y)
+        {
+            return IsInVirtualRange(Convert.ToInt32(x), Convert.ToInt32(y));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Check if point is in virtual area. </summary>
+        /// <param name="x"> X point. </param>
+        /// <param name="y"> Y point. </param>
+        /// <returns> True - point is in virtual area. </returns>
+        public bool IsInVirtualRange(int x, int y)
+        {
+            if (x < VirtualPosition.X || y < VirtualPosition.Y)
+                return false;
+
+            if (x > VirtualSize.Width || y > VirtualSize.Height)
+                return false;
+
+            return true;
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Map virtual area to oryignal area. </summary>
+        /// <param name="virtualRect"> Virtual area react. </param>
+        /// <returns> Area mapped to oryginal area. </returns>
+        public Rectangle MapToOryginalSize(Rectangle virtualRect)
+        {
+            return MapToOryginalSize(virtualRect.X, virtualRect.Y, virtualRect.Width, virtualRect.Height);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Map virtual area to oryignal area. </summary>
+        /// <param name="x"> X point. </param>
+        /// <param name="y"> Y point. </param>
+        /// <param name="width"> Width. </param>
+        /// <param name="height"> Height. </param>
+        /// <returns> Area mapped to oryginal area. </returns>
+        public Rectangle MapToOryginalSize(double x, double y, double width, double height)
+        {
+            return MapToOryginalSize(
+                Convert.ToInt32(x),
+                Convert.ToInt32(y),
+                Convert.ToInt32(width),
+                Convert.ToInt32(height));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Map virtual area to oryignal area. </summary>
+        /// <param name="x"> X point. </param>
+        /// <param name="y"> Y point. </param>
+        /// <param name="width"> Width. </param>
+        /// <param name="height"> Height. </param>
+        /// <returns> Area mapped to oryginal area. </returns>
+        public Rectangle MapToOryginalSize(int x, int y, int width, int height)
+        {
+            return new Rectangle(ScaleX(x), ScaleY(y), ScaleX(width), ScaleY(height));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Scale X point or width to oryginal. </summary>
+        /// <param name="x"> X point or width. </param>
+        /// <returns> Oryginal X point or width. </returns>
+        private int ScaleX(int x)
+        {
+            return Convert.ToInt32((100 * x) / (XScale ?? 1));
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Scale Y point or height to oryginal. </summary>
+        /// <param name="x"> Y point or height. </param>
+        /// <returns> Oryginal Y point or height. </returns>
+        private int ScaleY(int y)
+        {
+            return Convert.ToInt32((100 * y) / (YScale ?? 1));
+        }
+
+        #endregion MAP METHODS
+
     }
 }

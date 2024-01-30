@@ -1,6 +1,7 @@
 ﻿using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using SystemController.Screens.Data;
 
 namespace SystemController.Screens
@@ -55,6 +56,15 @@ namespace SystemController.Screens
 
         //  --------------------------------------------------------------------------------
         /// <summary> Capture screenshot from specific area. </summary>
+        /// <param name="selectedArea"> Selected area as rect. </param>
+        /// <returns> Screenshot bitmap. </returns>
+        public static Bitmap CaptureArea(Rectangle selectedArea)
+        {
+            return CaptureArea(selectedArea.X, selectedArea.Y, selectedArea.Width, selectedArea.Height);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Capture screenshot from specific area. </summary>
         /// <param name="x"> Screen X point. </param>
         /// <param name="y"> Screen Y point. </param>
         /// <param name="width"> Screenshot width. </param>
@@ -66,6 +76,15 @@ namespace SystemController.Screens
             Rectangle clampedRect = ClampScreenshotArea(x, y, width, height, screensRect);
 
             return CaptureScreen(clampedRect);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Capture screenshot from specific area as bitmap image. </summary>
+        /// <param name="selectedArea"> Selected area as rect. </param>
+        /// <returns> Screenshot bitmap image. </returns>
+        public static BitmapImage CaptureAreaAsBitmapImage(Rectangle selectedArea)
+        {
+            return CaptureAreaAsBitmapImage(selectedArea.X, selectedArea.Y, selectedArea.Width, selectedArea.Height);
         }
 
         //  --------------------------------------------------------------------------------
@@ -83,6 +102,14 @@ namespace SystemController.Screens
 
         //  --------------------------------------------------------------------------------
         /// <summary> Capture screenshot from specific area to clipboard. </summary>
+        /// <param name="selectedArea"> Selected area as rect. </param>
+        public static void CaptureAreaToClipboard(Rectangle selectedArea)
+        {
+            CaptureAreaToClipboard(selectedArea.X, selectedArea.Y, selectedArea.Width, selectedArea.Height);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Capture screenshot from specific area to clipboard. </summary>
         /// <param name="x"> Screen X point. </param>
         /// <param name="y"> Screen Y point. </param>
         /// <param name="width"> Screenshot width. </param>
@@ -91,6 +118,17 @@ namespace SystemController.Screens
         {
             var bitmap = CaptureArea(x, y, width, height);
             CopyBitmapToClipboard(bitmap);
+        }
+
+        //  --------------------------------------------------------------------------------
+        /// <summary> Capture screenshot from specific area and save to file. </summary>
+        /// <param name="selectedArea"> Selected area as rect. </param>
+        /// <param name="filePath"> Save file path. </param>
+        /// <param name="imageFormat"> Image format (default PNG). </param>
+        public static void CaptureAreaToFile(Rectangle selectedArea, string filePath, ImageFormat? imageFormat = null)
+        {
+            CaptureAreaToFile(selectedArea.X, selectedArea.Y, selectedArea.Width, selectedArea.Height,
+                filePath, imageFormat);
         }
 
         //  --------------------------------------------------------------------------------

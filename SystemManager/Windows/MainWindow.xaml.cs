@@ -108,6 +108,13 @@ namespace SystemManager.Windows
             PagesControl.LoadPageOrGetLast(new ProcessesPage(IMContainer));
         }
 
+        //  --------------------------------------------------------------------------------
+        /// <summary> Open screenshot page main menu item. </summary>
+        private void OpenScreenshotsPageMainMenuItemSelect()
+        {
+            PagesControl.LoadPageOrGetLast(new ScreenshotPage(IMContainer));
+        }
+
         #endregion MAIN MENU INTERACTION METHODS
 
         #region PROPERITES CHANGED METHODS
@@ -149,6 +156,7 @@ namespace SystemManager.Windows
             {
                 new MainMenuItemViewModel("Macros", "Scripts for automated management", PackIconKind.Code, OpenMacrosPageMainMenuItemSelect),
                 new MainMenuItemViewModel("Processes", "Show running processes", PackIconKind.Memory, OpenProcessesPageMainMenuItemSelect),
+                new MainMenuItemViewModel("Screenshot", "Make screenshots", PackIconKind.MonitorScreenshot, OpenScreenshotsPageMainMenuItemSelect),
                 new MainMenuItemViewModel("Close", "Shut down application", PackIconKind.Power, CloseApplicationMainMenuItemSelect)
             };
 

@@ -54,6 +54,34 @@ namespace SystemController.Screens
             return Screen.AllScreens.Count();
         }
 
+        //  --------------------------------------------------------------------------------
+        /// <summary> Get dictionary of selected region per screen. </summary>
+        /// <param name="selection"> Selection rect. </param>
+        /// <returns> Dictionary of screen info with selected region in it. </returns>
+        public static Dictionary<ScreenInfo, Rectangle> GetSelectedRegions(Rectangle selection)
+        {
+            Dictionary<ScreenInfo, Rectangle> selections = new Dictionary<ScreenInfo, Rectangle>();
+
+            foreach (var screenInfo in GetAllScreens())
+            {
+                Rectangle screenVirtualRect = screenInfo.VirtualRect;
+                Rectangle intersection = Rectangle.Intersect(selection, screenVirtualRect);
+
+                if (!intersection.IsEmpty)
+                {
+                    Rectangle selectedRegionOnScreen = new Rectangle(
+                        intersection.X - screenVirtualRect.X,
+                        intersection.Y - screenVirtualRect.Y,
+                        intersection.Width,
+                        intersection.Height);
+
+                    selections.Add(screenInfo, selectedRegionOnScreen);
+                }
+            }
+
+            return selections;
+        }
+
         #region UTILITY METHODS
 
         //  --------------------------------------------------------------------------------
