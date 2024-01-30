@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using SystemController.ProcessesManagement.Data;
+using SystemController.Processes.Data;
 using SystemManager.Data.Processes;
 using SystemManager.Data.Processes.Events;
 using SystemManager.InternalMessages;

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SystemController.ProcessesManagement.Data;
+using SystemController.Processes.Data;
 using SystemManager.ViewModels.Base;
 
 namespace SystemManager.ViewModels.Processes

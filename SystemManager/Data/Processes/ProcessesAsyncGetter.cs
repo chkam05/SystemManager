@@ -4,8 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SystemController.ProcessesManagement;
-using SystemController.ProcessesManagement.Data;
+using SystemController.Processes;
+using SystemController.Processes.Data;
 using SystemManager.Data.Processes.Data;
 using SystemManager.Data.Processes.Events;
 

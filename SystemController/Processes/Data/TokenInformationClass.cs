@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SystemController.ProcessesManagement.Data
+namespace SystemController.Processes.Data
 {
-    public enum ProcessMode
+    public enum TokenInformationClass
     {
-        Bit32,
-        Bit64
+        TokenUser = 1
     }
 }

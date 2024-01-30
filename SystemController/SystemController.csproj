@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>SystemController</Title>
@@ -13,6 +13,10 @@
     <PackageProjectUrl>https://github.com/chkam05/SystemManager</PackageProjectUrl>
     <RepositoryUrl>https://github.com/chkam05/SystemManager</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<dpiAware>true/pm</dpiAware>
+	<dpiAwareness>PerMonitor</dpiAwareness>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>

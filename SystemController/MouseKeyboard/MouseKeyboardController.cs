@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 using SystemController.Data;
 using SystemController.MouseKeyboard.Data;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace SystemController.MouseKeyboard
 {
@@ -78,7 +71,7 @@ namespace SystemController.MouseKeyboard
                 if (_pressedKeys.Contains(keyCode))
                     throw new Exception($"Release {keyCode} key before it is pressed again.");
 
-                keybd_event(keyCode, 0, Keys.KEYEVENTF_KEYDOWN, UIntPtr.Zero);
+                keybd_event(keyCode, 0, Data.Keys.KEYEVENTF_KEYDOWN, UIntPtr.Zero);
                 _pressedKeys.Add(keyCode);
             }
 
@@ -87,7 +80,7 @@ namespace SystemController.MouseKeyboard
                 if (!_pressedKeys.Contains(keyCode))
                     throw new Exception($"Key {keyCode} has not been pressed.");
 
-                keybd_event(keyCode, 0, Keys.KEYEVENTF_KEYUP, UIntPtr.Zero);
+                keybd_event(keyCode, 0, Data.Keys.KEYEVENTF_KEYUP, UIntPtr.Zero);
                 _pressedKeys.Remove(keyCode);
             }
         }
@@ -104,10 +97,10 @@ namespace SystemController.MouseKeyboard
                 throw new Exception($"Release {string.Join(",", pressedKeys)} keys before they are pressed again.");
 
             foreach (var keyCode in keyCodes)
-                keybd_event(keyCode, 0, Keys.KEYEVENTF_KEYDOWN, UIntPtr.Zero);
+                keybd_event(keyCode, 0, Data.Keys.KEYEVENTF_KEYDOWN, UIntPtr.Zero);
 
             foreach (var keyCode in keyCodes)
-                keybd_event(keyCode, 0, Keys.KEYEVENTF_KEYUP, UIntPtr.Zero);
+                keybd_event(keyCode, 0, Data.Keys.KEYEVENTF_KEYUP, UIntPtr.Zero);
         }
 
         #endregion KEYBOARD
@@ -140,7 +133,7 @@ namespace SystemController.MouseKeyboard
                         if (_pressedLMB)
                             throw new Exception($"Release LMB before it is pressed again.");
 
-                        mouse_event(MouseButtons.MOUSEEVENTF_LEFTDOWN, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
+                        mouse_event(Data.MouseButtons.MOUSEEVENTF_LEFTDOWN, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
                         _pressedLMB = true;
                     }
                     if (IsRelease(mode))
@@ -148,7 +141,7 @@ namespace SystemController.MouseKeyboard
                         if (!_pressedLMB)
                             throw new Exception($"LMB has not been pressed.");
 
-                        mouse_event(MouseButtons.MOUSEEVENTF_LEFTUP, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
+                        mouse_event(Data.MouseButtons.MOUSEEVENTF_LEFTUP, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
                         _pressedLMB = false;
                     }
                     break;
@@ -159,7 +152,7 @@ namespace SystemController.MouseKeyboard
                         if (_pressedRMB)
                             throw new Exception($"Release RMB before it is pressed again.");
 
-                        mouse_event(MouseButtons.MOUSEEVENTF_RIGHTDOWN, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
+                        mouse_event(Data.MouseButtons.MOUSEEVENTF_RIGHTDOWN, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
                         _pressedRMB = true;
                     }
                     if (IsRelease(mode))
@@ -167,7 +160,7 @@ namespace SystemController.MouseKeyboard
                         if (!_pressedRMB)
                             throw new Exception($"LMB has not been pressed.");
 
-                        mouse_event(MouseButtons.MOUSEEVENTF_RIGHTUP, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
+                        mouse_event(Data.MouseButtons.MOUSEEVENTF_RIGHTUP, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
                         _pressedRMB = false;
                     }
                     break;
@@ -178,7 +171,7 @@ namespace SystemController.MouseKeyboard
                         if (_pressedMMB)
                             throw new Exception($"Release MMB before it is pressed again.");
 
-                        mouse_event(MouseButtons.MOUSEEVENTF_MIDDLEDOWN, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
+                        mouse_event(Data.MouseButtons.MOUSEEVENTF_MIDDLEDOWN, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
                         _pressedMMB = true;
                     }
                     if (IsRelease(mode))
@@ -186,7 +179,7 @@ namespace SystemController.MouseKeyboard
                         if (!_pressedMMB)
                             throw new Exception($"MMB has not been pressed.");
 
-                        mouse_event(MouseButtons.MOUSEEVENTF_MIDDLEUP, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
+                        mouse_event(Data.MouseButtons.MOUSEEVENTF_MIDDLEUP, cursorPos.X, cursorPos.Y, 0, UIntPtr.Zero);
                         _pressedMMB = false;
                     }
                     break;
@@ -208,7 +201,7 @@ namespace SystemController.MouseKeyboard
         public void SimulateHorizontalMouseScroll(int delta)
         {
             GetCursorPos(out POINT cursorPos);
-            mouse_event(MouseButtons.MOUSEEVENTF_HWHEEL, cursorPos.X, cursorPos.Y, (uint)delta, UIntPtr.Zero);
+            mouse_event(Data.MouseButtons.MOUSEEVENTF_HWHEEL, cursorPos.X, cursorPos.Y, (uint)delta, UIntPtr.Zero);
         }
 
         //  --------------------------------------------------------------------------------
@@ -217,7 +210,7 @@ namespace SystemController.MouseKeyboard
         public void SimulateVerticalMouseScroll(int delta)
         {
             GetCursorPos(out POINT cursorPos);
-            mouse_event(MouseButtons.MOUSEEVENTF_WHEEL, cursorPos.X, cursorPos.Y, (uint)delta, UIntPtr.Zero);
+            mouse_event(Data.MouseButtons.MOUSEEVENTF_WHEEL, cursorPos.X, cursorPos.Y, (uint)delta, UIntPtr.Zero);
         }
 
         #endregion MOUSE

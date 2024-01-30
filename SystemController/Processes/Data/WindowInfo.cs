@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using SystemController.Data;
 
-namespace SystemController.ProcessesManagement.Data
+namespace SystemController.Processes.Data
 {
     public class WindowInfo
     {

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using SystemController.Data;
-using SystemController.ProcessesManagement.Data;
+using SystemController.Processes.Data;
 using SystemManager.ViewModels.Base;
 
 namespace SystemManager.ViewModels.Processes

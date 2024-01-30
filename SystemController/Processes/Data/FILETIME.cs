@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SystemController.ProcessesManagement.Data
+namespace SystemController.Processes.Data
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct SID_AND_ATTRIBUTES
+    public struct FILETIME
     {
-        public IntPtr Sid;
-        public uint Attributes;
+        public uint dwLowDateTime;
+        public uint dwHighDateTime;
     }
 }

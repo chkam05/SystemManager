@@ -13,7 +13,7 @@ namespace SystemController.MouseKeyboard.Events
         //  VARIABLES
 
         public int Delta { get; private set; }
-        public ScrollOrientation Orientation { get; private set; }
+        public Data.ScrollOrientation Orientation { get; private set; }
 
 
         //  METHODS
@@ -24,7 +24,7 @@ namespace SystemController.MouseKeyboard.Events
         /// <summary> MouseScrollEventArgs class constructor. </summary>
         /// <param name="delta"> Scroll delta. </param>
         /// <param name="scrollOrientation"> Scroll orientation. </param>
-        public MouseScrollEventArgs(int delta, ScrollOrientation scrollOrientation)
+        public MouseScrollEventArgs(int delta, Data.ScrollOrientation scrollOrientation)
         {
             Delta = delta;
             Orientation = scrollOrientation;

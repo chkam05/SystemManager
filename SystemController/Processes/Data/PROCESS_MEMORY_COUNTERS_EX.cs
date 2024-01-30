@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SystemController.ProcessesManagement.Data
+namespace SystemController.Processes.Data
 {
     [StructLayout(LayoutKind.Sequential, Size = 72)]
     public struct PROCESS_MEMORY_COUNTERS_EX

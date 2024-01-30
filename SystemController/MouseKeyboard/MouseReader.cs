@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using SystemController.Data;
 using SystemController.MouseKeyboard.Data;
 using SystemController.MouseKeyboard.Events;
@@ -220,37 +219,37 @@ namespace SystemController.MouseKeyboard
             {
                 MSLLHOOKSTRUCT mouseHookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
 
-                if (wParam == (IntPtr)MouseButtons.WM_LBUTTONDOWN)
+                if (wParam == (IntPtr)Data.MouseButtons.WM_LBUTTONDOWN)
                 {
                     HandleMouseClick(MouseButton.LeftButton, KeyState.Press);
                 }
-                else if (wParam == (IntPtr)MouseButtons.WM_LBUTTONUP)
+                else if (wParam == (IntPtr)Data.MouseButtons.WM_LBUTTONUP)
                 {
                     HandleMouseClick(MouseButton.LeftButton, KeyState.Release);
                 }
-                else if (wParam == (IntPtr)MouseButtons.WM_RBUTTONDOWN)
+                else if (wParam == (IntPtr)Data.MouseButtons.WM_RBUTTONDOWN)
                 {
                     HandleMouseClick(MouseButton.RightButton, KeyState.Press);
                 }
-                else if (wParam == (IntPtr)MouseButtons.WM_RBUTTONUP)
+                else if (wParam == (IntPtr)Data.MouseButtons.WM_RBUTTONUP)
                 {
                     HandleMouseClick(MouseButton.LeftButton, KeyState.Release);
                 }
-                else if (wParam == (IntPtr)MouseButtons.WM_MBUTTONDOWN)
+                else if (wParam == (IntPtr)Data.MouseButtons.WM_MBUTTONDOWN)
                 {
                     HandleMouseClick(MouseButton.MiddleButton, KeyState.Press);
                 }
-                else if (wParam == (IntPtr)MouseButtons.WM_MBUTTONUP)
+                else if (wParam == (IntPtr)Data.MouseButtons.WM_MBUTTONUP)
                 {
                     HandleMouseClick(MouseButton.LeftButton, KeyState.Release);
                 }
-                else if (wParam == (IntPtr)MouseButtons.WM_MOUSEWHEEL)
+                else if (wParam == (IntPtr)Data.MouseButtons.WM_MOUSEWHEEL)
                 {
-                    HandleMouseScroll(mouseHookStruct.mouseData, ScrollOrientation.Vertical);
+                    HandleMouseScroll(mouseHookStruct.mouseData, Data.ScrollOrientation.Vertical);
                 }
-                else if (wParam == (IntPtr)MouseButtons.WM_MOUSEHWHEEL)
+                else if (wParam == (IntPtr)Data.MouseButtons.WM_MOUSEHWHEEL)
                 {
-                    HandleMouseScroll(mouseHookStruct.mouseData, ScrollOrientation.Horizontal);
+                    HandleMouseScroll(mouseHookStruct.mouseData, Data.ScrollOrientation.Horizontal);
                 }
 
                 HandleMouseMove(mouseHookStruct.pt);
@@ -314,7 +313,7 @@ namespace SystemController.MouseKeyboard
         /// <summary> Method for handle mouse scroll. </summary>
         /// <param name="delta"> Scroll delta. </param>
         /// <param name="scrollOrientation"> Scroll orientation. </param>
-        private void HandleMouseScroll(uint delta, ScrollOrientation scrollOrientation)
+        private void HandleMouseScroll(uint delta, Data.ScrollOrientation scrollOrientation)
         {
             OnMouseScroll?.Invoke(this, new MouseScrollEventArgs((int)delta, scrollOrientation));
         }

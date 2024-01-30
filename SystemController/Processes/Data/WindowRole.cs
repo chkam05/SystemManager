@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SystemController.ProcessesManagement.Data
+namespace SystemController.Processes.Data
 {
     public enum WindowRole
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SystemController.ProcessesManagement.Data;
+using SystemController.Processes.Data;
 
 namespace SystemManager.Data.Processes.Data
 {

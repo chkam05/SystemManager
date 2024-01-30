@@ -19,8 +19,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using SystemController.MouseKeyboard;
-using SystemController.ProcessesManagement;
-using SystemController.ProcessesManagement.Data;
+using SystemController.Processes;
+using SystemController.Processes.Data;
 using SystemManager.Data.Processes;
 using SystemManager.ViewModels.Processes;
 

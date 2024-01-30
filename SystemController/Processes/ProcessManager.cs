@@ -9,9 +9,9 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using SystemController.Data;
-using SystemController.ProcessesManagement.Data;
+using SystemController.Processes.Data;
 
-namespace SystemController.ProcessesManagement
+namespace SystemController.Processes
 {
     public class ProcessManager
     {

@@ -32,7 +32,7 @@ namespace SystemController.MouseKeyboard
 
         private LowLevelKeyboardProc _handler;
 
-        public delegate void KeyPressedEventHandler(object sender, KeyPressEventArgs e);
+        public delegate void KeyPressedEventHandler(object sender, Events.KeyPressEventArgs e);
         public delegate void KeysListeningFinishedEventHandler(object sender, KeysListeningFinishedEventArgs e);
         public delegate void ThrowExceptionEventHandler(object sender, ThrownExceptionEventArgs e);
 
@@ -277,7 +277,7 @@ namespace SystemController.MouseKeyboard
                     pressedKeys.Add(keyCode);
             }
 
-            OnKeyPress?.Invoke(this, new KeyPressEventArgs(keyCode, pressedKeys.ToArray(), keyState, HeldKeys));
+            OnKeyPress?.Invoke(this, new Events.KeyPressEventArgs(keyCode, pressedKeys.ToArray(), keyState, HeldKeys));
         }
 
         #endregion LISTENING METHODS
