@@ -24,7 +24,7 @@
     MouseOverTitleBarButtonForeground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     PressedTitleBarButtonBackground="{Binding AccentPressedBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     PressedTitleBarButtonForeground="{Binding ThemeForegroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
-    Title="MainWindow"
+    Title="System Manager"
     Width="800"
     Loaded="WindowLoaded"
     Closing="WindowExClosing">
