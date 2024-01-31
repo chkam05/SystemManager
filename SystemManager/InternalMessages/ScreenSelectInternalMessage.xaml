@@ -15,7 +15,7 @@
     Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     BorderBrush="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     BottomBackground="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
-    BottomBorderBrush="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+    BottomBorderBrush="{Binding ThemeShadeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     BottomPadding="8"
     ButtonBackground="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
     ButtonBorderBrush="{Binding AccentColorBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
@@ -55,14 +55,16 @@
         <cex:ScrollViewerEx
             x:Name="_scorllViewer"
             HorizontalAlignment="Stretch"
-            HorizontalScrollBarVisibility="Visible"
+            HorizontalScrollBarVisibility="Auto"
             MinHeight="256"
             MinWidth="512"
             VerticalAlignment="Stretch"
-            VerticalScrollBarVisibility="Visible">
+            VerticalScrollBarVisibility="Auto">
 
             <Canvas
-                x:Name="_canvas"/>
+                x:Name="_canvas"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
 
         </cex:ScrollViewerEx>
     </Grid>

@@ -82,7 +82,7 @@ namespace SystemManager.Pages
                     var mappedRegion = selectedRegions.Select(r => r.Key.MapToOryginalSize(r.Value))
                         .Aggregate(System.Drawing.Rectangle.Union);
 
-                    var screenBitmapImage = ScreenshotManager.CaptureAreaAsBitmapImage(e.Rectangle);
+                    var screenBitmapImage = ScreenshotManager.CaptureAreaAsBitmapImage(mappedRegion);
                     _dataContext.SetImageSource(screenBitmapImage);
                 }
                 else

@@ -109,6 +109,13 @@ namespace SystemManager.Windows
         }
 
         //  --------------------------------------------------------------------------------
+        /// <summary> Open screens page main menu item. </summary>
+        private void OpenScreensPageMainMenuItemSelect()
+        {
+            PagesControl.LoadPageOrGetLast(new ScreensPage(IMContainer));
+        }
+
+        //  --------------------------------------------------------------------------------
         /// <summary> Open screenshot page main menu item. </summary>
         private void OpenScreenshotsPageMainMenuItemSelect()
         {
@@ -156,6 +163,7 @@ namespace SystemManager.Windows
             {
                 new MainMenuItemViewModel("Macros", "Scripts for automated management", PackIconKind.Code, OpenMacrosPageMainMenuItemSelect),
                 new MainMenuItemViewModel("Processes", "Show running processes", PackIconKind.Memory, OpenProcessesPageMainMenuItemSelect),
+                new MainMenuItemViewModel("Screens", "Show screens", PackIconKind.Monitors, OpenScreensPageMainMenuItemSelect),
                 new MainMenuItemViewModel("Screenshot", "Make screenshots", PackIconKind.MonitorScreenshot, OpenScreenshotsPageMainMenuItemSelect),
                 new MainMenuItemViewModel("Close", "Shut down application", PackIconKind.Power, CloseApplicationMainMenuItemSelect)
             };

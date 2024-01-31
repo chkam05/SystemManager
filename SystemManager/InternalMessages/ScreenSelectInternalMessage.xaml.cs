@@ -20,7 +20,7 @@ namespace SystemManager.InternalMessages
 
         //  CONST
 
-        private const double SCALING = 0.25d;
+        private const double SCALING = 0.10d;
 
 
         //  VARIABLES

@@ -1,0 +1,211 @@
+﻿<Page
+    x:Class="SystemManager.Pages.ScreensPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cex="clr-namespace:chkam05.Tools.ControlsEx;assembly=chkam05.Tools.ControlsEx"
+    xmlns:cfg="clr-namespace:SystemManager.Data.Configuration"
+    xmlns:ctrls="clr-namespace:SystemManager.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SystemManager.Pages"
+    mc:Ignorable="d"
+    
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background="Transparent"
+    Foreground="White"
+    Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- STATIC -->
+
+            <x:Static x:Key="AppearanceConfig" Member="cfg:AppearanceConfig.Instance"/>
+            <x:Static x:Key="ConfigManager" Member="cfg:ConfigManager.Instance"/>
+            
+            <!-- STYLES -->
+            
+            
+
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Border
+        Background="White"
+        BorderBrush="{x:Null}"
+        BorderThickness="0"
+        CornerRadius="0,0,8,0"
+        ClipToBounds="True"
+        SnapsToDevicePixels="True">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border
+                Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                BorderBrush="{x:Null}"
+                BorderThickness="0"
+                Grid.Row="0"
+                Padding="8">
+
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+
+                        <cex:ButtonEx
+                            Content="Refresh"
+                            IconKind="Refresh"
+                            Click="RefreshButtonExClick"/>
+
+                    </StackPanel>
+
+                </Grid>
+
+            </Border>
+
+            <Grid
+                Grid.Row="1">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <cex:ScrollViewerEx
+                    x:Name="_screensScrollVeiwer"
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalAlignment="Stretch"
+                    VerticalScrollBarVisibility="Auto">
+
+                    <Canvas
+                        x:Name="_screensCanvas"/>
+
+                </cex:ScrollViewerEx>
+
+                <Border
+                    Background="{Binding ThemeBackgroundBrush, Source={StaticResource AppearanceConfig}, Mode=OneWay}"
+                    BorderBrush="{x:Null}"
+                    BorderThickness="0"
+                    Grid.Column="1"
+                    Padding="8">
+
+                    <cex:ScrollViewerEx
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto">
+
+                        <StackPanel
+                            Orientation="Vertical">
+
+                            <ctrls:KeyValueViewControl
+                                Header="Device Name"
+                                Value="{Binding SelectedScreen.DeviceName, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Device Path"
+                                Value="{Binding SelectedScreen.DevicePath, Mode=OneWay}"/>
+                            
+                            <ctrls:KeyValueViewControl
+                                Header="Internal device name"
+                                Value="{Binding SelectedScreen.InternalDeviceName, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Bits per Pixel"
+                                Value="{Binding SelectedScreen.BitsPerPixel, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Driver Version"
+                                Value="{Binding SelectedScreen.DriverVersion, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Frequency"
+                                Value="{Binding SelectedScreen.Frequency, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Main Screen"
+                                Value="{Binding SelectedScreen.IsMainScreen, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Orientation"
+                                Value="{Binding SelectedScreen.Orientation, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Has oryg. dimensions"
+                                Value="{Binding SelectedScreen.HasOryginalDimensions, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Position"
+                                Value="{Binding SelectedScreen.PositionXY, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Size"
+                                Value="{Binding SelectedScreen.Size, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Spec Version"
+                                Value="{Binding SelectedScreen.SpecVersion, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Virtual Position"
+                                Value="{Binding SelectedScreen.VirtualPositionXY, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Virtual Size"
+                                Value="{Binding SelectedScreen.VirtualSize, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Has oryg. work dimensions"
+                                Value="{Binding SelectedScreen.HasOryginalWorkDimensions, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Work Position"
+                                Value="{Binding SelectedScreen.WorkPositionXY, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Work Size"
+                                Value="{Binding SelectedScreen.WorkSize, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Virtual Work Position"
+                                Value="{Binding SelectedScreen.VirtualWorkPositionXY, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Virtual Work Size"
+                                Value="{Binding SelectedScreen.VirtualWorkSize, Mode=OneWay}"/>
+
+                            <ctrls:KeyValueViewControl
+                                Header="Scaling"
+                                Value="{Binding SelectedScreen.Scale, Mode=OneWay}"/>
+
+                        </StackPanel>
+
+                    </cex:ScrollViewerEx>
+
+                </Border>
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+    
+</Page>

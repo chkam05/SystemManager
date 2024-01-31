@@ -115,9 +115,14 @@ namespace SystemController.Screens.Data
         /// <summary> Map virtual area to oryignal area. </summary>
         /// <param name="virtualRect"> Virtual area react. </param>
         /// <returns> Area mapped to oryginal area. </returns>
-        public Rectangle MapToOryginalSize(Rectangle virtualRect)
+        public Rectangle MapToOryginalSize(Rectangle virtualRect, bool onlySize = false)
         {
-            return MapToOryginalSize(virtualRect.X, virtualRect.Y, virtualRect.Width, virtualRect.Height);
+            return MapToOryginalSize(
+                virtualRect.X,
+                virtualRect.Y,
+                virtualRect.Width,
+                virtualRect.Height,
+                onlySize);
         }
 
         //  --------------------------------------------------------------------------------
@@ -127,13 +132,14 @@ namespace SystemController.Screens.Data
         /// <param name="width"> Width. </param>
         /// <param name="height"> Height. </param>
         /// <returns> Area mapped to oryginal area. </returns>
-        public Rectangle MapToOryginalSize(double x, double y, double width, double height)
+        public Rectangle MapToOryginalSize(double x, double y, double width, double height, bool onlySize = false)
         {
             return MapToOryginalSize(
                 Convert.ToInt32(x),
                 Convert.ToInt32(y),
                 Convert.ToInt32(width),
-                Convert.ToInt32(height));
+                Convert.ToInt32(height),
+                onlySize);
         }
 
         //  --------------------------------------------------------------------------------
@@ -143,9 +149,13 @@ namespace SystemController.Screens.Data
         /// <param name="width"> Width. </param>
         /// <param name="height"> Height. </param>
         /// <returns> Area mapped to oryginal area. </returns>
-        public Rectangle MapToOryginalSize(int x, int y, int width, int height)
+        public Rectangle MapToOryginalSize(int x, int y, int width, int height, bool onlySize = false)
         {
-            return new Rectangle(ScaleX(x), ScaleY(y), ScaleX(width), ScaleY(height));
+            return new Rectangle(
+                onlySize ? x :ScaleX(x),
+                onlySize ? y : ScaleY(y),
+                ScaleX(width),
+                ScaleY(height));
         }
 
         //  --------------------------------------------------------------------------------
